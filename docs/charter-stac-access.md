@@ -7,6 +7,7 @@ https://supervisor.disasterscharter.org/api
 
 ## IP Allowlist
 - `178.105.74.184` - DevSeed dev server (Hetzner)
+- `110.34.1.108` (Toggle Testing)
 - `20.223.144.10` - IFRC staging cluster
 - `137.135.138.134` - IFRC production cluster
 
