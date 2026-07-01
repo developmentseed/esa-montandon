@@ -1,0 +1,13 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+sequenceDiagram
+    participant SRC as Alert (CEMS RSS / Montandon)
+    participant ORC as Orchestrator
+    participant COR as Correlation (D2.1)
+    participant K8S as K8s job and notebook
+    participant GO as IFRC GO
+    SRC->>ORC: new event
+    ORC->>COR: correlate EO layer to event data
+    COR-->>ORC: assembled data context
+    ORC->>K8S: run notebooks per analysis matrix
+    K8S->>K8S: footprint intersect exposure
+    K8S->>GO: publish artifacts (HTML / PDF / maps)

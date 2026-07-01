@@ -1,0 +1,23 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+flowchart LR
+    subgraph CH["International Charter model"]
+      Call["Call"]
+      Activation["Activation"]
+      Area["Area of interest"]
+      Acquisition["Acquisition (calibrated)"]
+      VAP["Value-Added Product"]
+    end
+    subgraph MO["Monty model"]
+      Event["Event"]
+      Hazard["Hazard"]
+      RDat["Response<br/>eo-dat"]:::resp
+      RVap["Response<br/>eo-del / eo-gra / eo-vap"]:::resp
+      Impact["Impact"]
+    end
+    Call --> Event
+    Activation --> Event
+    Area --> Hazard
+    Acquisition --> RDat
+    VAP --> RVap
+    VAP -.->|damage figures| Impact
+    classDef resp fill:#CF3F02,color:#ffffff,stroke:#CF3F02;

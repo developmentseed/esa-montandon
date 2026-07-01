@@ -1,0 +1,13 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+flowchart TB
+    subgraph Static["Static identifier"]
+      S["monty:corr_id<br/>deterministic key"]:::box
+    end
+    subgraph Dynamic["Dynamic correlation"]
+      Q["CQL2 query<br/>hazard + country + time + space"]:::box
+    end
+    S --> C
+    Q --> C
+    C["Correlated item cluster<br/>Event · Hazard · Impact · Response"]:::hub
+    classDef box fill:#F7F5F4,color:#333333,stroke:#DDDDDD;
+    classDef hub fill:#CF3F02,color:#ffffff,stroke:#CF3F02;

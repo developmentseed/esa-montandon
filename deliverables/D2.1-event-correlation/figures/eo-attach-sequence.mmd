@@ -1,0 +1,11 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+sequenceDiagram
+    participant P as EO product (CEMS / Charter / UNOSAT)
+    participant E as ETL and pystac-monty
+    participant API as Montandon STAC API
+    P->>E: ingest, anchored on source_id
+    E->>E: derive corr_id from date, country, hazard
+    E->>API: Algorithm 1 - find reference event
+    API-->>E: matching Event
+    E->>API: attach Response with corr_id and reference-event / source-event links
+    Note over API: product now discoverable via corr_id and roles = response

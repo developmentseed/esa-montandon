@@ -1,0 +1,4 @@
+# Build artifacts, installed deps, and image-embed cache
+*/build/
+*/figures/.cache/
+assets/docx-builder/node_modules/

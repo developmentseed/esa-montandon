@@ -1,0 +1,35 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+classDiagram
+    class Event {
+      +roles = [event]
+      +corr_id
+      +hazard_codes
+      +country_codes
+    }
+    class Hazard {
+      +roles = [hazard]
+      +hazard_detail
+    }
+    class Impact {
+      +roles = [impact]
+      +impact_detail
+    }
+    class Response {
+      +roles = [response]
+      +response_detail
+    }
+    class ResponseDetail {
+      +type
+      +source_id
+      +status
+      +monitoring_number
+      +producer
+      +methodology
+      +sendai_targets
+    }
+    Response --> ResponseDetail : carries
+    Event --> Hazard : reference-event
+    Event --> Impact : reference-event
+    Event --> Response : reference-event
+    Response --> Hazard : related-hazard
+    Impact --> Response : derived_from

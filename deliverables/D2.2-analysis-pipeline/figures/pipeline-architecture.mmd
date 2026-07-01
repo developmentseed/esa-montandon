@@ -1,0 +1,26 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+flowchart TB
+    subgraph MON["Monitoring and data systems"]
+      direction LR
+      CEMS["Copernicus EMS<br/>RSS feed"]
+      MONT["Montandon STAC API<br/>new events"]
+      UNO["UNOSAT API"]
+    end
+    subgraph ORCH["Event orchestration"]
+      LIS["Listener / poller"] --> COR["Correlation logic (D2.1)"] --> MQ["Message queue / event bus"]:::hub
+    end
+    subgraph COMPUTE["Kubernetes cluster"]
+      JOB["K8s job controller"]:::hub --> POD["Notebook execution pod<br/>papermill"]
+    end
+    subgraph REPO["Code and analysis repos"]
+      PY["pystac-monty"]
+      NB["Modular notebooks<br/>exposure / damage / resilience"]
+    end
+    subgraph OUT["Outputs"]
+      ART["Artifacts<br/>HTML / PDF / JSON / maps"] --> GO["IFRC GO platform<br/>DREF workflow"]
+    end
+    MON --> LIS
+    MQ --> JOB
+    REPO -.-> POD
+    POD --> ART
+    classDef hub fill:#CF3F02,color:#ffffff,stroke:#CF3F02;
