@@ -1,0 +1,14 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+flowchart TB
+    SRC["CEMS Grading product<br/>multi-thematic damage statistics"]:::src
+    SRC ==> R["Response item<br/>eo-gra"]:::resp
+    SRC ==> I1["Impact item<br/>population"]:::imp
+    SRC ==> I2["Impact item<br/>buildings"]:::imp
+    SRC ==> I3["Impact item<br/>roads"]:::imp
+    I1 -->|derived_from| R
+    I2 -->|derived_from| R
+    I3 -->|derived_from| R
+    R -. shared monty:corr_id .- I2
+    classDef src fill:#EEF0F6,color:#333333,stroke:#CCD3E0;
+    classDef resp fill:#CF3F02,color:#ffffff,stroke:#CF3F02;
+    classDef imp fill:#F7F5F4,color:#333333,stroke:#DDDDDD;

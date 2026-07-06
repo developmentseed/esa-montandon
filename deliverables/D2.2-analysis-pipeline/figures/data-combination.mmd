@@ -1,0 +1,9 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+flowchart LR
+    HAZ["EO hazard footprint<br/>flood extent / burned area / damage grade"]:::eo --> X["intersect (∩)"]:::op
+    EXP["Exposure layers<br/>population · infrastructure"]:::exp --> X
+    X --> STAT["Per-admin-unit statistics<br/>people and assets within the hazard extent"]:::out
+    classDef eo fill:#CF3F02,color:#ffffff,stroke:#CF3F02;
+    classDef exp fill:#EEF0F6,color:#333333,stroke:#CCD3E0;
+    classDef op fill:#534E4E,color:#ffffff,stroke:#534E4E;
+    classDef out fill:#F7F5F4,color:#333333,stroke:#DDDDDD;

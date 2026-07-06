@@ -1,0 +1,16 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+flowchart TB
+    GLIDE["GLIDE event"]:::src --> REF
+    GDACS["GDACS event"]:::src --> REF
+    EMDAT["EM-DAT event"]:::src --> REF
+    REF["Reference Event<br/>Spain floods, 27 Oct 2024<br/>corr_id 20241027-ESP-…"]:::hub
+    REF --> HAZ["Hazard<br/>flood MH0600"]:::box
+    REF --> IMP["Impact<br/>fatalities, affected"]:::box
+    REF --> CEMS["Response<br/>CEMS eo-del / eo-gra"]:::resp
+    REF --> UNO["Response<br/>UNOSAT eo-gra"]:::resp
+    CEMS --> IMP2["Impact<br/>buildings, population"]:::box
+    IMP2 -->|derived_from| CEMS
+    classDef src fill:#EEF0F6,color:#333333,stroke:#CCD3E0;
+    classDef box fill:#F7F5F4,color:#333333,stroke:#DDDDDD;
+    classDef resp fill:#FBE3D6,color:#333333,stroke:#CF3F02;
+    classDef hub fill:#CF3F02,color:#ffffff,stroke:#CF3F02;

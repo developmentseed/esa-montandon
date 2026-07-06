@@ -1,0 +1,25 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Open Sans, Arial, sans-serif'}}}%%
+flowchart TB
+    subgraph Charter["Charter VAP Response item"]
+      c1["monty:"]:::monty
+      c2["disaster:"]:::ext
+      c3["processing:"]:::ext
+    end
+    subgraph CEMS["CEMS product Response item"]
+      m1["monty:"]:::monty
+      m2["processing:"]:::ext
+    end
+    subgraph UNOSAT["UNOSAT product Response item"]
+      u1["monty:"]:::monty
+      u2["processing:"]:::ext
+    end
+    subgraph ACQ["Linked acquisition item"]
+      a1["eo: / sar: / sat:"]:::acq
+      a2["disaster: (Charter)"]:::acq
+    end
+    Charter -->|derived_from| ACQ
+    CEMS -->|derived_from| ACQ
+    UNOSAT -->|derived_from| ACQ
+    classDef monty fill:#CF3F02,color:#ffffff,stroke:#CF3F02;
+    classDef ext fill:#F7F5F4,color:#333333,stroke:#DDDDDD;
+    classDef acq fill:#EEF0F6,color:#333333,stroke:#CCD3E0;
