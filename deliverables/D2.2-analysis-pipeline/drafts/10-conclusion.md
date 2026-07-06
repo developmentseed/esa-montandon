@@ -16,9 +16,12 @@ decision-ready analytics for humanitarian response. Its defining characteristics
   Jupyter, TiTiler, `pystac-monty`), released under Apache 2.0, aligned with ESA's Open Science strategy
   and IFRC's operational platforms.
 
-The strategic payoff is direct: it connects space-based observation managed by ESA to the DREF funding
-decisions that drive IFRC's response, giving 191 National Societies faster, evidence-based analytics
-grounded in authoritative EO data.
+The strategic payoff is direct and runs both ways: it connects space-based observation managed by ESA to
+the DREF funding decisions that drive IFRC's response — giving 191 National Societies faster,
+evidence-based analytics grounded in authoritative EO data — and it feeds humanitarian prioritisation
+**back to the International Charter** to help target its next acquisitions. The three analysis families
+the pipeline runs are made concrete as the use cases in deliverable **D2.4** (exposure, impact, and
+response prioritisation).
 
 ## Roadmap to WP2 execution
 

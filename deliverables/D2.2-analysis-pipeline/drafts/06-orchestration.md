@@ -60,3 +60,10 @@ The outputs — static HTML reports, PDFs, JSON, and map layers — are uploaded
 emergency page. Because each artifact is tied to the event's correlation identifier, it is unambiguously
 associated with its disaster. The pipeline is built to add, edit, and re-trigger analyses easily, so the
 catalog of automated outputs grows over time.
+
+In addition to static artifacts, outputs can be published as **dedicated STAC collections and STAC API
+methods** (for example a prioritisation collection), correlated to the event and to the source
+activation. This lets them be consumed directly by client applications — including the **International
+Charter's own tools** (a Charter Mapper overlay, or a Charter chatbot) — and lets a prioritisation feed
+**back to the Charter** to help target the next acquisition or mapping. This bidirectional,
+Charter-facing delivery path is detailed in deliverable D2.4 (Use Case 3).

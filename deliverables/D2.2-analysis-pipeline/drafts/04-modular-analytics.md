@@ -30,11 +30,15 @@ peer-reviewed, openly accessible algorithms.
 | --- | --- | --- |
 | **Exposure estimation** | How many people / how much infrastructure lies within the observed hazard extent? | Flood extent, burned area, hazard footprint |
 | **Damage assessment** | What is damaged, and to what degree, in the affected area? | Grading products, damage layers (Copernicus, UNOSAT) |
-| **Resilience indicators** | How vulnerable is the affected population, and what is its coping capacity? | Combined with demographic / socio-economic layers |
+| **Resilience indicators / response prioritisation** | Which affected areas should be prioritised for response, combining exposure, impact, vulnerability, history and coverage? | Synthesises the exposure and damage outputs above |
 
-These map onto the WP2 operational priorities of exposure estimation, potential damage assessment, and
-resilience indicators, and onto the hazard types prioritised for the activity (floods, wildfires,
-earthquakes, and cyclones).
+These three families correspond directly to the use cases detailed in deliverable **D2.4**: exposure
+estimation (Use Case 1), damage / impact assessment (Use Case 2), and resilience-based response
+prioritisation (Use Case 3, which synthesises the other two). They map onto the WP2 operational
+priorities and the hazard types prioritised for the activity (floods, wildfires, earthquakes, and
+cyclones). Beyond a value or a score, an analysis output can carry a **data-completeness confidence
+measure** and an automatically generated **plain-language rationale**, so results are transparent and
+auditable rather than opaque numbers.
 
 ![A Copernicus EMS grading product (per-feature damage classification, EMSR773 Valencia) — an example of the EO damage layer the damage-assessment notebook family consumes. © European Union, Copernicus Emergency Management Service.](cems-gra-example.png)
 
