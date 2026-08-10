@@ -1,0 +1,13 @@
+geopandas==1.1.4
+pandas==2.3.3
+numpy==2.2.6
+openpyxl==3.1.5
+xarray==2025.6.1
+rasterio==1.4.3
+affine==2.4.0
+rasterstats==0.21.0
+shapely==2.1.2
+rioxarray==0.19.0
+Jinja2==3.1.6
+streamlit==1.60.0
+plotly==6.9.0
