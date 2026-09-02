@@ -1,0 +1,46 @@
+# Folder name under input/copernicus/{activation_id}/ (must contain data.gpkg or data.geojson)
+activation_id: "EMSR884"
+
+# Documentation only; does not change the loader. Options: flood | wildfire | storm | earthquake
+hazard_type: "earthquake"
+
+# GADM admin level. Options: 1 (region) | 2 (municipality / department) | 3 (finer, if GADM has it)
+target_admin_level: 2
+
+# Reserved for age-disaggregated WorldPop later. Currently unused. Options: all | children | under_5
+target_age_group: "all"
+
+# ISO3 country code for GADM + WorldPop (e.g. VEN, NPL, UKR). Must match the event country.
+country_code: "VEN"
+
+# Bounding box [west, south, east, north] in WGS84. null = derived from the Copernicus file
+bbox: null
+
+# Analysis CRS. Options: auto (local UTM from the data) | an EPSG string such as EPSG:32619
+analysis_crs: "auto"
+
+impact:
+  # Attribute used to keep "affected" features. If this column is missing (typical flood/burn polygons), all features are kept.
+  # Common names in CEMS files: damage | damage_confidence | damage_class | grading | class
+  damage_column: damage
+  # Value that means affected. Must match the column type:
+  #   damage (EMSR884): 1  (0 = not damaged)
+  #   damage_confidence: high_confidence  (other values: possible | probable)
+  #   grading / class: Destroyed  or  Damaged  (depends on the product)
+  damage_positive_value: 1
+  # Extra degrees added around the Copernicus extent for OSM / WorldPop clip
+  bbox_buffer_deg: 0.05
+
+baseline:
+  # OSM layers to query. Implemented keys: hospital | school | primary_road | secondary_road | airport
+  # Remove any you do not need (roads are the heaviest Overpass queries).
+  infrastructure_filters: ["hospital", "school", "primary_road", "secondary_road", "airport"]
+  # WorldPop unconstrained 1 km year. Current download template is built for 2020.
+  worldpop_year: 2020
+  # Admin boundaries. Options: gadm (works) | hdx (not implemented)
+  admin_source: "gadm"
+
+outputs:
+  map_html: "data/impact_map.html"
+  zonal_csv: "data/impact_by_admin.csv"
+  zonal_geojson: "data/impact_by_admin.geojson"
