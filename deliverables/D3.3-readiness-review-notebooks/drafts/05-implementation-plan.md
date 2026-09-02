@@ -1,8 +1,8 @@
 # Implementation Plan
 
-This plan phases WP3 from its current, largely pre-build state to a working, demonstrated platform. It
-is sequenced around WP3's dependency chain rather than starting deliverables in parallel that are not
-yet actionable.
+This plan phases WP3 from its current state, a validated core pattern with the Django layer not yet
+built, to a working, demonstrated platform. It is sequenced around WP3's dependency chain rather than
+starting deliverables in parallel that are not yet actionable.
 
 ## Phase 1 — Resolve open questions and stand up a minimal skeleton (through September 2026)
 
@@ -42,7 +42,7 @@ yet actionable.
 11. **Run the IFRC user demonstration (D3.4)**, once training material (D3.1) and the platform (D3.3)
     are both far enough along to support a meaningful session with real National Society users, ideally
     incorporating the same National Societies interviewed during WP2's consultation round (D2.3, Section
-    4.4) for continuity.
+    4.5) for continuity.
 
 ## Ongoing
 

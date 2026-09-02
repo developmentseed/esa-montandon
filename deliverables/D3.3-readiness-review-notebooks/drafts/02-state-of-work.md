@@ -2,11 +2,12 @@
 
 ## 2.1 Notebook-publishing architecture (D3.3 core)
 
-**Status: architecture proposed and discussed; no implementation started.**
+**Status: architecture proposed and discussed; core pattern already validated by WP2; Django
+implementation not started.**
 
 The proposed design was written up in detail by the team, grounded in the original MapAction use-cases
-document and iterated into a walkthrough site outlining the architecture end to end. It has not yet had
-dedicated engineering time; the tracking issue remains open with no linked implementation work.
+document and iterated into a walkthrough site outlining the architecture end to end. The tracking issue
+remains open with no linked Django/Celery implementation work.
 
 The proposed architecture is:
 
@@ -23,25 +24,30 @@ The proposed architecture is:
 
 This design does not introduce new infrastructure. It composes Django, Celery, and Kubernetes, all
 either already used elsewhere in this stack or standard, well-understood tools, around the same
-notebook-as-interchangeable-object model WP2 already validated. The three use cases (risk exposure,
-impact estimation, response prioritisation; see D2.3) map directly onto this platform as the initial set
-of "official" templates.
+notebook-as-interchangeable-object model WP2 already validated. Of the three use cases (risk exposure,
+impact estimation, response prioritisation; see D2.3), Use Case 1 and Use Case 2 are already built and
+map directly onto this platform as templates; Use Case 3 will follow once built.
 
-**Early proof of concept.** MapAction's Streamlit application for Use Case 1 (see D2.3, Section 2.1),
-while built independently of this architecture, already demonstrates the core user-facing pattern this
-platform is meant to generalise: select parameters, trigger a computation, get a usable output. It is a
-useful reference implementation as the Django platform is built.
+**Proof of concept, already in production.** The core user-facing pattern this platform is meant to
+generalise, parameterise a notebook, run it via papermill, publish the result as static HTML, is not
+hypothetical: WP2's Use Case 1 notebooks already work exactly this way. The data-preparation,
+exposure-calculation, and visualisation notebooks take a country parameter and run end to end via
+papermill, validated for more than one country, and the output is published to a live MyST site
+(D2.3, Section 2.1). This de-risks the platform's central mechanism well ahead of building the Django
+orchestration layer around it. An earlier Streamlit prototype explored a guided-form interface for the
+same use case but is not expected to carry forward.
 
-**What is missing.** An implementation. No Django project, Celery configuration, or authoring UI exists
-yet. Four specific design questions remain open (Section 4) and should be resolved before significant
-engineering investment, since they affect the shape of the data model and the compute strategy.
+**What remains.** The Django orchestration layer itself: no Django project, Celery configuration, or
+authoring UI exists yet. Four specific design questions remain open (Section 4) and should be resolved
+before significant engineering investment, since they affect the shape of the data model and the compute
+strategy.
 
 ## 2.2 Training material for relevant user communities (D3.1)
 
 **Status: not started; scheduled to begin October 2026.**
 
 MapAction, who own this deliverable, have stated that training material development will start once the
-National Society consultations (D2.3, Section 4.4) conclude and the first user-facing notebooks and
+National Society consultations (D2.3, Section 4.5) conclude and the first user-facing notebooks and
 tools have a first working version. This is a sensible sequencing choice; training material built
 against an unstable interface would need rework. It does mean D3.1 has no content yet.
 

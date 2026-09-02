@@ -7,34 +7,40 @@ four linked deliverables: this notebook-publishing platform (D3.3 itself), train
 technical documentation for integration into ESA JupyterLab environments (D3.2), and a demonstration
 with IFRC users (D3.4). At the deliverable owner's direction, this report assesses readiness across all
 four rather than the notebook-publishing piece in isolation, since the four are sequentially dependent
-on one another.
+on one another. WP3's deliverables are due through December 2026, so this report weighs the soundness of
+the design and its dependencies more heavily than whether every piece is built today.
 
 ## Where things stand
 
-WP3 is the earliest-stage of the project's active work packages. Its core piece, a Django application
-that lets select users author, run, and publish analysis notebooks from templates with a light
-authentication layer, exists today as a detailed architecture proposal, written up and discussed by the
-team but not yet built. The three other WP3 deliverables are downstream of it and of the WP2 use-case
-notebooks (D2.3), and none has started in earnest:
+WP3 is the earliest-stage of the project's active work packages, which is expected given its position
+downstream of WP1 and WP2. Its core piece, a Django application that lets select users author, run, and
+publish analysis notebooks from templates with a light authentication layer, exists today as a detailed
+architecture proposal, written up and discussed by the team. The pattern it proposes (parameterised
+notebooks, run via papermill, published as static output) is not merely theoretical: WP2's Use Case 1
+notebooks already work exactly this way in production, parameterised by country and published as a
+working example, which is a strong, concrete validation of the approach ahead of building the Django
+layer around it.
 
-- **Notebook-publishing architecture (D3.3 core):** proposal complete and discussed with the team; no
-  implementation started.
+The three other WP3 deliverables are downstream of this platform and of the WP2 use-case notebooks
+(D2.3), and none has started in earnest:
+
+- **Notebook-publishing architecture (D3.3 core):** proposal complete and discussed with the team, with
+  its core pattern already validated by WP2's notebooks; Django/Celery implementation not started.
 - **Training material (D3.1):** not started; planned to begin in October, once user-facing notebooks
   and stakeholder consultations exist to train against.
 - **Technical documentation for ESA JupyterLab integration (D3.2):** not started.
 - **User demonstration with IFRC (D3.4):** not started; depends on the above three.
 
-This sequencing was expected: WP3 begins after WP1 and WP2 lay the foundation it builds on.
-
 ## Confidence
 
-Confidence in the notebook-publishing architecture is medium: every component it proposes (Django,
-Celery, Kubernetes, papermill, object storage) is already proven elsewhere in this project's stack, and
+Confidence in the notebook-publishing architecture is medium-high: every component it proposes (Django,
+Celery, Kubernetes, papermill, object storage) is already proven elsewhere in this project's stack, its
+core parameterised-notebook pattern is already working in production for WP2's Use Case 1, and
 authentication has a low-risk path by delegating to IFRC's existing identity provider rather than
 building a new one. Confidence in the training, documentation, and demonstration deliverables landing in
-finished form by their nominal dates is low-medium, because each depends on artefacts, stable use-case
-notebooks, a working publishing platform, that do not yet exist. This is a sequencing risk, not a
-design risk.
+finished form by their nominal dates is medium-low, because each depends on artefacts, stable use-case
+notebooks, a working publishing platform, that do not yet exist. Given the December deadline, this is a
+sequencing risk, not a design risk or a cause for concern in itself.
 
 ## What this report covers
 

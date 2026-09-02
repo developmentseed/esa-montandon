@@ -2,11 +2,13 @@
 
 ## Assessment outcome
 
-WP3 is at an early, design-and-planning stage. Its core piece, the notebook-publishing architecture, is
-well thought through, reuses proven infrastructure, and carries medium confidence once four specific
-open questions are resolved. Its three dependent deliverables (training, ESA JupyterLab documentation,
-and the IFRC demonstration) have not started, the expected and previously agreed consequence of their
-position in the dependency chain, not a sign of the work package falling behind.
+WP3 is at an early, design-and-planning stage, though its core mechanism is already validated in
+production through WP2's Use Case 1 notebooks. The notebook-publishing architecture is well thought
+through, reuses proven infrastructure, and carries medium-high confidence once four specific open
+questions are resolved. Its three dependent deliverables (training, ESA JupyterLab documentation, and
+the IFRC demonstration) have not started, the expected and previously agreed consequence of their
+position in the dependency chain, not a sign of the work package falling behind, and all have runway to
+their December deadline.
 
 ## Topics for the Readiness Review meeting
 
