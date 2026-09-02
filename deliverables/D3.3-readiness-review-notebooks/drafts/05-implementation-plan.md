@@ -1,0 +1,60 @@
+# Implementation Plan
+
+This plan phases WP3 from its current, largely pre-build state to a working, demonstrated platform. It
+is sequenced around WP3's real dependency chain rather than forcing parallel starts on deliverables that
+are not yet actionable.
+
+## Phase 1 — Resolve open questions and stand up a minimal skeleton (through September 2026)
+
+1. **Answer the four architecture questions** (Section 4.1) in a short, written design decision —
+   provisional answers are enough to unblock building; they do not need to be permanent.
+2. **Decide the baseline-computation strategy** jointly with D2.3's Section 5, item 1 — this one
+   decision simplifies both WP2's Use Case 1 delivery and this platform's data model.
+3. **Confirm the authentication approach** (Section 4.2) with the owner of IFRC's identity platform, and
+   design the Django app's user/permission model around delegated authentication from day one rather
+   than retrofitting it.
+4. **Stand up a minimal Django + Celery + papermill skeleton** that can run one existing WP2 notebook
+   (the most stable of the three use cases — see D2.3) end-to-end: select parameters, queue a job,
+   produce a static output. This is deliberately narrow in scope — one notebook, one hazard — to prove
+   the pattern before generalising it.
+
+## Phase 2 — First official templates and training content in parallel (October–November 2026)
+
+5. **Register the WP2 use-case notebooks as templates** in the platform as each reaches a stable,
+   validated state per D2.3's timeline — starting with Use Case 1, then Use Case 2.
+6. **Begin training material development (D3.1)** in parallel, per MapAction's own October start plan,
+   now that there is a real (if minimal) platform and at least one stable notebook to train against.
+7. **Add object-storage publishing and the discovery/browse UI**, so generated analyses are
+   findable by country, administrative area, and event — the second half of the use-case description in
+   Section 2.1.
+
+## Phase 3 — Authoring layer and documentation (November–December 2026)
+
+8. **Build the light authoring UI** for select, authorised users — copy-from-template, a parameter form,
+   submit-and-track-a-run — restricted by the delegated-authentication model from Phase 1.
+9. **Implement the "published vs. scratchpad" distinction** decided in Section 4.1, item 3, as a
+   first-class status on generated outputs.
+10. **Draft technical documentation for ESA JupyterLab integration (D3.2)**, once the platform's
+    notebook/environment contract is stable enough that the documentation will not need immediate
+    rework.
+
+## Phase 4 — Demonstration (early 2027, or as training and platform maturity allow)
+
+11. **Run the IFRC user demonstration (D3.4)**, once training material (D3.1) and the platform (D3.3)
+    are both far enough along to support a meaningful session with real National Society users, ideally
+    incorporating the same National Societies interviewed during WP2's consultation round (D2.3, Section
+    4.4) for continuity.
+
+## Ongoing
+
+12. **Assign an owner for notebook-catalogue governance** (Section 4.1, item 4) before the catalogue
+    grows large enough for tidiness to become a real problem — this is cheap to do early and expensive
+    to retrofit.
+
+## Sequencing rationale
+
+We have deliberately not proposed starting D3.1, D3.2, or D3.4 in parallel with Phase 1, even though
+that would look more active in a status report. Each genuinely depends on artefacts that do not yet
+exist, and starting them early would mean redoing that work once the platform's real shape is known.
+This plan optimises for the fastest realistic path to a working, demonstrated system, not for the
+appearance of activity across all four deliverables at once.
