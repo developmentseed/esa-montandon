@@ -19,7 +19,7 @@ Progress is uneven across the three use cases, and each is ahead of where a firs
 requests alone would suggest.
 
 - **Use Case 1 (Risk Exposure)** is furthest along. MapAction has delivered baseline exposure-calculation
-  notebooks covering four specified hazards (flood, cyclone, earthquake and wildfire), parameterised
+  notebooks covering three out four planned hazards (flood, cyclone, earthquake with wildfire under development), parameterised
   so the same notebook runs for any country, and published as a working example. An earlier Streamlit
   prototype explored a guided-form interface but is not expected to be the long-term interface.
 - **Use Case 2 (Impact Estimation)** has an initial notebook implementation, built by MapAction, opened
