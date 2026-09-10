@@ -26,8 +26,11 @@ requests alone would suggest.
   for review this week. It has not yet been run against a live event end to end, and the Copernicus EMS
   and Charter data it depends on is not yet flowing into Montandon (see below).
 - **Use Case 3 (Response Prioritisation)** is the most developed on paper. Its methodology, data sources,
-  and worked example are fully specified in the D2.4 use-case narrative. No notebook implementation has
-  started, and it depends on outputs from Use Cases 1 and 2 that are themselves still forming.
+  and worked example are fully specified in the D2.4 use-case narrative. The near-term plan has changed:
+  rather than building the composite prioritisation notebook now, International Charter users (UNOSAT and
+  ESA) will review Montandon directly and provide a report, resolving the scoping question in Section 4.1
+  in favour of expert review over engineering effort. The fuller build still depends on outputs from Use
+  Cases 1 and 2 that are themselves still forming.
 
 None of the three yet lets a National Society user run a new analysis of their own without technical
 support; that self-service layer is the subject of WP3 (see D3.3).
@@ -35,20 +38,21 @@ support; that self-service layer is the subject of WP3 (see D3.3).
 ## Confidence
 
 Confidence in reaching a usable state ahead of D2.4 is high for Use Case 1, medium-high for Use Case 2,
-and medium for Use Case 3, pending a scoping decision on how much of it is demonstrated now versus built
-out through WP2 execution. None of this reflects architecture risk: the D2.2 pipeline design is sound
+and medium for Use Case 3, whose near-term scope is now set: a Charter-user (UNOSAT/ESA) review of
+Montandon rather than a built composite score. None of this reflects architecture risk: the D2.2 pipeline design is sound
 and already reused across all three. The remaining risk is in sequencing, in getting real disaster data
 flowing, and in a small number of open decisions, not in the design itself.
 
 ## What could block progress
 
 Three issues could slow the use cases regardless of individual notebook progress. The Copernicus EMS and
-International Charter ETL pipelines, which supply the EO hazard data Use Cases 2 and 3 depend on, are not
-yet loading data into Montandon: both transformers are built and under active development, but neither is
-deployed as a running pipeline yet. The Montandon production database has index bloat and a
+International Charter ETL pipelines, which supply the EO hazard data Use Cases 2 and 3 depend on, are
+close but not yet loading data into Montandon on staging: Copernicus EMS data is now flowing in the alpha
+environment, with staging expected around 11 September 2026, and Charter is expected on staging roughly a
+week after that. The Montandon production database has index bloat and a
 query-performance risk that is only partly mitigated ([issue #34](https://github.com/developmentseed/esa-montandon/issues/34)).
 The strategy for how, and how often, baseline exposure data should be computed and published is still
-undecided. All three are tracked and owned; none is resolved.
+undecided. All three are tracked and owned; the ETL timeline is now close to resolved, the other two are not.
 
 ## What this report covers
 

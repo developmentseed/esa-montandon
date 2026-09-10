@@ -31,8 +31,9 @@ land first, though the December deadline gives it room to land well.
 
 - **D3.3** to high: the four open questions in Section 4 resolved, and a minimal, working Django +
   Celery + papermill skeleton stood up against one existing WP2 notebook.
-- **D3.1** to medium: the National Society consultations (D2.3, Section 4.5) concluding on schedule,
-  and at least one stable WP2 use-case notebook to train against.
+- **D3.1** to medium: the National Society consultations (D2.3, Section 4.5, 6 of 11 conducted so far,
+  strongly validating Use Cases 1 and 2) concluding on schedule, and at least one stable WP2 use-case
+  notebook to train against.
 - **D3.2** to medium: D3.3 reaching a state where its notebook/environment contract is fixed enough to
   document without near-term rework.
 - **D3.4** to medium: a concrete demonstration date set, once D3.1–D3.3 are far enough along to support

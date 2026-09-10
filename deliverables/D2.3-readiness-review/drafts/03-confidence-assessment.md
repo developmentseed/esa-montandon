@@ -12,8 +12,8 @@ and clear remaining steps is rated higher here than raw "lines of code shipped" 
 | Use case | Build status | Confidence in reaching demonstrable state | Basis |
 | --- | --- | --- | --- |
 | UC1 — Risk Exposure | Built: 4 of 4 hazards, parameterised, published | **High** | Working, published notebooks exist today; the remaining baseline-compute decision is scoping, not engineering |
-| UC2 — Impact Estimation | Built by MapAction, opened for review | **Medium-high** | Follows a proven, now twice-validated pattern from UC1; unvalidated against a real event, partly because CEMS/Charter data is not yet loading into Montandon |
-| UC3 — Response Prioritisation | Specification complete and reviewed; build not started | **Medium** | No architecture risk and a strong specification; ample runway to December, but inherits sequencing risk from UC1 and UC2 |
+| UC2 — Impact Estimation | Built by MapAction, opened for review | **Medium-high** | Follows a proven, now twice-validated pattern from UC1; unvalidated against a real event, partly because CEMS/Charter data is not yet on staging (CEMS hoped ~11 Sept 2026, Charter ~1 week later) |
+| UC3 — Response Prioritisation | Specification complete and reviewed; near-term scope set to a Charter-user (UNOSAT/ESA) review rather than a build | **Medium** | No architecture risk and a strong specification; scope decision made; ample runway to December for the fuller build, but inherits sequencing risk from UC1 and UC2 |
 
 ## Basis for the assessment
 
@@ -26,21 +26,22 @@ on UC1 and UC2.
 Use Case 1 can reasonably be shown working end to end at the Readiness Review meeting; it already is,
 in published form. Use Case 2 is close behind, gated mainly by real-event validation rather than by
 anything still to design or build. Use Case 3 is earliest in its build cycle, but that is expected at
-this point in the schedule and does not, on its own, lower confidence in it landing well ahead of
+this point in the schedule, and its near-term validation path (a Charter-user review by UNOSAT and ESA
+rather than an implementation) does not, on its own, lower confidence in it landing well ahead of
 December.
 
 ## What would raise confidence
 
 - **UC1** to very high: the baseline-computation strategy decided (Section 4).
-- **UC2** to high: one of the CEMS or Charter `montandon-etl` integration PRs (Section 2.4) merged, and
-  one full run against the resulting live event, reviewed by an IFRC or MapAction domain expert.
-- **UC3** to medium-high: UC2 validated, and an explicit scoping decision on how much of the
-  prioritisation methodology is built and demonstrated now versus carried into full WP2 execution.
+- **UC2** to high: CEMS or Charter reaching staging (Section 2.4), and one full run against the
+  resulting live event, reviewed by an IFRC or MapAction domain expert.
+- **UC3** to medium-high: UC2 validated, and the Charter-user (UNOSAT/ESA) review of Montandon completed
+  and reported back.
 
 ## What would lower it
 
 Continued production-database performance degradation ([issue #34](https://github.com/developmentseed/esa-montandon/issues/34))
 is the one risk that could lower confidence across all three use cases simultaneously, since every
 notebook queries the same Montandon STAC API for its structured data. Remediation is underway but not
-complete. A prolonged delay in either the CEMS or Charter `montandon-etl` integration would similarly
+complete. A delay beyond the expected mid-September staging dates for CEMS or Charter would similarly
 hold back Use Case 2 and, in turn, Use Case 3.

@@ -49,7 +49,7 @@ its timeline has a direct bearing on Use Case 3's.
 
 ## 2.3 Use Case 3 — Operational Response Prioritisation
 
-**Status: fully specified, build not started.**
+**Status: fully specified; near-term path changed from a build to a Charter-user review.**
 
 Unlike the other two, this use case's context, data sources, and methodology are already written up in
 detail in the D2.4 narrative, including a worked, illustrative example against the 24 June 2026 La
@@ -57,34 +57,51 @@ Guaira (Venezuela) earthquake activation (Charter Act-1036 / EMSR894) and a prop
 back into Charter client tools: a STAC `response-prioritisation` collection, a Charter Mapper overlay,
 and a conversational client. This specification work is complete and reviewed.
 
-**What remains.** No notebook or pipeline implementation exists yet, which is expected this far ahead of
-the December D2.4 deadline. This use case's core computation, combining the exposure output of Use Case
+The near-term plan for this use case has changed. Rather than building the composite prioritisation
+notebook now, International Charter users — UNOSAT and ESA — will review Montandon directly and provide
+a report. This substitutes a domain-expert review of the platform's outputs for engineering effort as the
+near-term validation step, and resolves the scoping question in Section 4.1 in favour of a
+specified-but-not-built status, validated by expert review rather than a partial build.
+
+**What remains.** No notebook or pipeline implementation exists yet, and per the decision above none is
+planned in the near term. This use case's core computation, combining the exposure output of Use Case
 1, the impact output of Use Case 2, INFORM vulnerability data, and Montandon's historical/operational
-record into a composite, explainable prioritisation score, is designed but unbuilt, and its two upstream
-dependencies are themselves still in progress (Sections 2.1–2.2). Several components described in the
-specification are marked as extensions beyond current scope (notably, incorporating field observations
-via a planned IFRC Emergency Operations Centre connection) and should not be read as MTR commitments.
+record into a composite, explainable prioritisation score, is designed but unbuilt; building it remains
+future WP2 execution work, once the Charter-user review is in and its two upstream dependencies are
+stable (Sections 2.1–2.2). Several components described in the specification are marked as extensions
+beyond current scope (notably, incorporating field observations via a planned IFRC Emergency Operations
+Centre connection) and should not be read as MTR commitments.
 
 ## 2.4 CEMS and Charter ETL pipelines
 
 Use Cases 2 and 3 both depend on Copernicus EMS and International Charter hazard and response data being
-loaded into Montandon. This is not yet the case, though both pipelines are in active development.
+loaded into Montandon. This is not yet the case on staging, though both pipelines are in active
+development and close to landing.
 
 **Copernicus EMS.** The transformer that converts CEMS Rapid Mapping products into Monty STAC items is
 implemented and merged in `pystac-monty`, and has received several rounds of fixes this past week
 (correcting related-item links and relaxing overly strict event matching). Deploying it as a running
-pipeline is in progress: the integration PR in `montandon-etl` has been open since 10 August 2026 and is
-not yet merged, so CEMS activations are not yet being ingested into the live Montandon STAC API.
+pipeline is progressing quickly: CEMS data is now flowing into the alpha environment, and staging is
+hoped for around 11 September 2026 — ahead of the Readiness Review meeting.
 
 **International Charter.** The transformer is implemented and merged in `pystac-monty`, built against a
-detailed, reviewed implementation specification. As with CEMS, the `montandon-etl` integration PR is
-still a draft, open since 26 June 2026, so Charter data is likewise not yet loading into Montandon.
+detailed, reviewed implementation specification. The `montandon-etl` integration PR, open since 26 June
+2026, is progressing toward a staging deployment expected roughly a week after CEMS, around
+17 September 2026.
+
+**pystac-monty versioning.** Separately from the CEMS/Charter transformers, a small number of
+`pystac-monty` changes, including item versioning, are implemented but not yet deployed to PROD.
+Versioning lets a Monty STAC item record which version of the transformer produced it, which matters for
+reproducibility as transformers keep changing. A follow-on piece of work, adding the version field to
+eoAPI's queryables so it can be used as a search filter, is tracked as
+[monty-stac-extension#147](https://github.com/IFRCGo/monty-stac-extension/issues/147).
 
 **What this means for Use Cases 2 and 3.** Both use cases can be developed and unit-tested against the
 worked examples already in `monty-stac-extension` (real CEMS and Charter fixtures used to build and
-validate the transformers), but cannot yet be run against a live, currently-correlated Montandon event
-until one of the two `montandon-etl` integration PRs merges. This is the most direct near-term dependency
-for validating Use Case 2 end to end (Section 4.1) and, in turn, for Use Case 3.
+validate the transformers), but cannot yet be run against a live, currently-correlated Montandon event on
+staging until CEMS's staging deployment lands (hoped for 11 September 2026) or Charter's (expected around
+17 September 2026). This is the most direct near-term dependency for validating Use Case 2 end to end
+(Section 4.1) and, in turn, for Use Case 3.
 
 ## Cross-cutting foundation
 

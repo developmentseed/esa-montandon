@@ -12,30 +12,31 @@ window, since there is runway to do them properly.
    pre-computation, published to cloud storage) is recommended over recomputing on demand, since a
    pre-computed dataset is cheaper to serve and keeps published outputs consistent. This is a decision,
    not new engineering, and should be made this week.
-2. **Merge one of the CEMS or Charter `montandon-etl` integration PRs** (Section 4.2). Either one gives
-   Use Case 2 a live event to validate against; CEMS is closer to merge-ready and is the more direct
-   route.
-3. **Run UC2 end to end against the resulting live event**, and get it reviewed by an IFRC or MapAction
-   domain expert. This is the single most valuable step to move UC2 from built to validated before the
-   meeting.
+2. **Confirm Copernicus EMS reaches staging** (Section 4.2), hoped for around 11 September 2026, ahead of
+   the meeting. This is now a matter of completing an in-flight deployment rather than merging a stalled
+   PR; Charter follows about a week later, around 17 September 2026.
+3. **Run UC2 end to end against the resulting live event**, once CEMS (or Charter) is live on staging,
+   and get it reviewed by an IFRC or MapAction domain expert. This is the single most valuable step to
+   move UC2 from built to validated before the meeting.
 4. **Progress the database remediation** (Section 4.3) as far as staging-cluster access allows; at
    minimum, complete the index cleanup on the highest-bloat partitions, since this is the change most
    likely to visibly affect notebook responsiveness before the meeting.
-5. **Bring forward early findings from the National Society interviews** (Section 4.5), even if the
-   full interview round is not complete, so the Readiness Review discussion is grounded in what
-   operational users have said so far.
+5. **Bring forward the National Society interview findings to date** (Section 4.5): 6 of 11 planned
+   interviews conducted, with results so far strongly validating Use Cases 1 and 2. This is a
+   substantive, positive signal worth featuring at the meeting, not merely a status update.
 
 ## Short-term (through end of September 2026)
 
-6. **Decide and communicate UC3's near-term scope** (Section 4.1): a full implementation, a defined
-   narrower slice, or a specified-but-deferred status, so effort is not spent building against an
-   unconfirmed target.
-7. **If UC3 is in scope for a partial build**, start with the exposure × impact × vulnerability
-   composite (reusing UC1 and UC2 outputs directly), deferring the historical-burden and
-   operational-gap-and-accessibility components, both marked optional in the specification, to full WP2
-   execution.
-8. **Merge the second of the two CEMS/Charter integration PRs**, so both sources are loading into
-   Montandon well ahead of December.
+6. **Communicate UC3's near-term scope decision** (Section 4.1) to stakeholders: a Charter-user
+   (UNOSAT/ESA) review of Montandon rather than a build, so effort is not spent on implementation the
+   plan no longer calls for at this stage.
+7. **Coordinate the Charter-user review** with UNOSAT and ESA: share Montandon access and the D2.4 UC3
+   narrative, and agree a timeline for their report.
+8. **Confirm Charter reaches staging** (the second of the two CEMS/Charter ETL pipelines), so both
+   sources are loading into Montandon well ahead of December. Separately, deploy the pending
+   `pystac-monty` versioning changes to PROD and progress
+   [monty-stac-extension#147](https://github.com/IFRCGo/monty-stac-extension/issues/147) (the eoAPI
+   queryables version field).
 9. **Resolve the remaining database work**: complete the vacuum/reindex pass, apply the autoscaling
    settings tuned to the cleaned-up database, and revisit the `context=off` and write-load settings
    proposed during the investigation.
@@ -54,9 +55,10 @@ window, since there is runway to do them properly.
 
 Database remediation is owned within the platform engineering effort, currently gated on staging-cluster
 access; escalating that access is itself an action item for this plan. The CEMS and Charter
-`montandon-etl` integrations each already have an assigned author and reviewer; merging them is a review
-and testing task, not new design work. UC1 and UC2 notebook and application work is owned by MapAction,
-with Development Seed supporting infrastructure and hosting. UC3 notebook development follows the same
-pattern once started. A single decision-owner should be named for the baseline-computation strategy
-(item 1) and the UC3 scope decision (item 6) at the Readiness Review meeting, since both are currently
-open questions rather than assigned tasks.
+`montandon-etl` integrations each already have an assigned author and reviewer; completing their staging
+deployment is a review and testing task, not new design work. UC1 and UC2 notebook and application work
+is owned by MapAction, with Development Seed supporting infrastructure and hosting. UC3 notebook
+development follows the same pattern once started, and its near-term Charter-user review is owned
+jointly with UNOSAT and ESA. A single decision-owner should be named for the baseline-computation
+strategy (item 1) at the Readiness Review meeting, since it is the one major open question remaining;
+UC3's near-term scope (item 6) is now decided and needs only confirmation and coordination.

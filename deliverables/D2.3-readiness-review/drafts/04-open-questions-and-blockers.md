@@ -23,21 +23,28 @@ against a live or recent Copernicus EMS or Charter activation, nor reviewed by a
 gated in part by Section 4.2 below: there is not yet a live CEMS or Charter event in Montandon to run it
 against. This is the highest-priority item before Use Case 2 can be called demonstrable.
 
-**UC3 — scope at MTR.** The full response-prioritisation methodology (Section 2.3) is ambitious and
-depends on two use cases that are not yet stable. A decision is needed on whether the near-term target is
-a full working implementation, a narrower slice (for example, the exposure/impact/vulnerability
-components only, without historical burden and operational-gap weighting), or a specified-but-not-built
-status carried into WP2 execution proper. Given the December deadline, this is a sequencing choice, not
-a cause for concern in itself.
+**UC3 — scope decided: review over build.** This is now resolved. Rather than a full working
+implementation or a narrower build slice, the near-term target is a specified-but-not-built status,
+validated through review rather than implementation: International Charter users — UNOSAT and ESA — will
+review Montandon directly and provide a report. This substitutes domain-expert review for engineering
+effort as the near-term validation step; building the composite prioritisation score itself (Section 2.3)
+remains future WP2 execution work, and still depends on two use cases that are not yet stable.
 
-## 4.2 Cross-cutting: CEMS and Charter data not yet in Montandon
+## 4.2 Cross-cutting: CEMS and Charter data not yet on staging
 
 Use Cases 2 and 3 need Copernicus EMS and Charter hazard/response data in Montandon to validate against
-real events; neither is loading yet (Section 2.4). Both transformers are implemented and merged in
-`pystac-monty`, with active bug-fixing this week (related-link and event-matching fixes for CEMS). Both
-`montandon-etl` deployment integrations are open: CEMS since 10 August 2026, Charter (draft) since 26
-June 2026. Neither is blocked on design; both are normal integration and review work. Merging either one
-is the fastest path to unblocking a real-event validation run for Use Case 2.
+real events; neither is on staging yet, though both are close (Section 2.4). Both transformers are
+implemented and merged in `pystac-monty`, with active bug-fixing this week (related-link and
+event-matching fixes for CEMS). CEMS data is now flowing in the alpha environment, with staging hoped
+for around 11 September 2026; Charter is expected on staging roughly a week later, around 17 September
+2026. Neither is blocked on design; both are normal integration and review work nearing completion.
+
+**pystac-monty versioning.** Separately, a small number of `pystac-monty` changes, including item
+versioning, are implemented but not yet deployed to PROD. A follow-on item, adding the version field to
+eoAPI's queryables so users can filter by transformer version, is tracked as
+[monty-stac-extension#147](https://github.com/IFRCGo/monty-stac-extension/issues/147). Neither is a
+blocker for Use Case 2 or 3 today, but both should land before those use cases are treated as fully
+reproducible.
 
 ## 4.3 Cross-cutting: Montandon platform performance
 
@@ -62,9 +69,9 @@ published at scale. A decision is pending.
 
 ## 4.5 Validation against real user needs
 
-IFRC and MapAction are conducting structured interviews with National Society operations teams (Zambia,
-Ethiopia, Kenya, Niger, Honduras, Chile, Netherlands, Denmark, Bangladesh, and the Philippines) through
-August 2026, to validate that the three use cases as specified match operational need. This work is in
-progress but not complete at the time of this report. Early, directional findings from these interviews,
-where available, should carry more weight in the Readiness Review discussion than polish on any single
-notebook, since they test the premise the use-case series rests on.
+IFRC and MapAction identified 11 National Society operations teams for structured interviews, including
+Zambia, Ethiopia, Kenya, Niger, Honduras, Chile, Netherlands, Denmark, Bangladesh, and the Philippines, to
+validate that the three use cases as specified match operational need. 6 of the 11 have been conducted so
+far. Results to date strongly validate Use Cases 1 and 2. This is a substantive, positive signal and
+should carry real weight in the Readiness Review discussion alongside build status, since it tests the
+premise the use-case series rests on.

@@ -26,7 +26,8 @@ This design does not introduce new infrastructure. It composes Django, Celery, a
 either already used elsewhere in this stack or standard, well-understood tools, around the same
 notebook-as-interchangeable-object model WP2 already validated. Of the three use cases (risk exposure,
 impact estimation, response prioritisation; see D2.3), Use Case 1 and Use Case 2 are already built and
-map directly onto this platform as templates; Use Case 3 will follow once built.
+map directly onto this platform as templates; Use Case 3 will follow once built, which per D2.3's Section
+4.1 is now planned after a Charter-user (UNOSAT/ESA) review of Montandon rather than immediately.
 
 **Proof of concept, already in production.** The core user-facing pattern this platform is meant to
 generalise, parameterise a notebook, run it via papermill, publish the result as static HTML, is not
