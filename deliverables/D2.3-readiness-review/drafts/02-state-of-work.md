@@ -12,8 +12,7 @@ history of the relevant repositories (`esa-montandon`, `manywidgets-playground`,
 
 MapAction delivered the baseline exposure-calculation methodology and an initial series of notebooks
 covering three hazards (riverine flood, tropical cyclone, earthquake), shared in late July. Wildfire, the
-fourth specified hazard, has since been added, so all four hazards specified for this use case are now
-covered.
+fourth specified hazard, is currently under development.
 
 The notebooks were also parameterised so a single notebook template runs for any country, rather than
 being hand-edited per country: the data-preparation, population-exposure, infrastructure-exposure, and
