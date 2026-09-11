@@ -26,7 +26,7 @@ underlying repositories alone would suggest.
 - **Use Case 3 (Utility Report)** has been reframed for this cycle. Rather than building the
   composite prioritisation notebook specified in the D2.4 narrative, the plan is to engage a third-party
   Charter-active partner (UNOSAT) given their role as Charter Project Manager for the current
-  large-scale activation in Nepal, to use the Montandon while working that activation and
+  large-scale activation in Nepal, to use the Montandon database while working that activation and
   produce a Utility Report on the data's relevance, fitness for purpose, and recommendations for future
   improvement. This is a best-effort engagement with no delivery commitment, which substantially lowers
   WP2's own execution risk; the originally specified composite-score implementation remains a longer-term
@@ -37,19 +37,20 @@ underlying repositories alone would suggest.
 Confidence in reaching a usable state ahead of D2.4 is high for Use Case 1 and for Use Case 2,
 and, in its reframed form, medium-high for Use Case 3: it no longer depends on WP2 engineering effort, on
 Use Cases 1 and 2 stabilising first, or on the CEMS/Charter ETL timeline, since it is an external
-partner's best-effort assessment of Montandon rather than a built composite score. The main uncertainty
-is whether a suitable partner and activation are confirmed and whether the partner delivers, not
-engineering risk. None of this reflects architecture risk: the D2.2 pipeline design is sound and already
+partner's best-effort assessment of Montandon rather than a built composite score. The partner and
+activation are effectively decided (UNOSAT, working the current Nepal activation); the main uncertainty
+now is simply whether a best-effort, non-committal partner delivers, not engineering risk. None of this
+reflects architecture risk: the D2.2 pipeline design is sound and already
 reused by Use Cases 1 and 2. The remaining risk is in sequencing, in getting real disaster data flowing,
 and in a small number of open decisions, not in the design itself.
 
 ## What could block progress
 
 Three issues could slow the use cases regardless of individual notebook progress. The Copernicus EMS and
-International Charter ETL pipelines, which supply the EO hazard data Use Cases 2 and 3 depend on, are
-close but not yet loading data into Montandon: Copernicus EMS data is now loaded in the alpha
-and staging environments, and Charter is expected on staging roughly a
-week after that. The Montandon production database has index bloat and a
+International Charter ETL pipelines, which supply the EO hazard data Use Case 2 depends on, are close but
+not yet fully in production: Copernicus EMS data has now reached staging, with production deployment
+still in progress and no confirmed date yet; Charter is expected on staging roughly a week after CEMS
+reached it. The Montandon production database has index bloat and a
 query-performance risk that is only partly mitigated ([issue #34](https://github.com/developmentseed/esa-montandon/issues/34)).
 The strategy for how, and how often, baseline exposure data should be computed and published is still
 undecided. All three are tracked and owned; the ETL timeline is now close to resolved, the other two are not. The performance issues aren't expected to block delivery of any deliverable in this contract.

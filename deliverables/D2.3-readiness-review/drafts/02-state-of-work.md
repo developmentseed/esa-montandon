@@ -51,7 +51,7 @@ which is independent of UC1/UC2 status.
 ## 2.3 Use Case 3 — Operational Response Prioritisation
 
 **Status: reframed for this cycle as an externally-led Utility Report rather than a build; partner and
-Charter activation not yet finalised.**
+activation decided (UNOSAT, Nepal), engagement terms being finalised.**
 
 The full response-prioritisation methodology, its data sources, and a worked example are already
 written up in detail in the D2.4 narrative, including an illustrative worked example against the
@@ -69,14 +69,15 @@ the relevance and fitness for purpose of Montandon's data for that work, with re
 improvement. Because there is no delivery obligation on either side, this carries very little execution
 risk for WP2, at the cost of no firm date for the report itself.
 
-**UNOSAT, Nepal.** The leading candidate is UNOSAT, since they are the Charter Project Manager for the
-current large-scale ("mega") activation in Nepal. This is not yet confirmed: the next step is agreeing a
-suitable Charter activation and partner. If an activation with Red Cross/Red Crescent involvement can be
-found, ideally Nepal itself, there is an additional opportunity to link Red Cross engagement to the
-activation results, potentially as part of a separate Montandon enhancement activity. This will be disucssed in the Readiness Review meeting in Geneva on September 14th.
+**UNOSAT, Nepal.** The partner and activation are effectively decided: UNOSAT, as Charter Project
+Manager for the current large-scale ("mega") activation in Nepal. What remains is agreeing engagement
+terms and Montandon access, not selecting a partner. Whether this activation also involves Red Cross or
+Red Crescent, which would additionally allow linking National Society engagement to the results, is
+still being explored, potentially as part of a separate Montandon enhancement activity. This will be
+discussed at the Readiness Review meeting in Geneva on 14 September.
 
-**What remains.** Confirming the activation and partner, and agreeing terms for the (non-committal)
-engagement. The composite-score implementation itself, combining the exposure output of Use Case 1, the
+**What remains.** Agreeing terms for the (non-committal) engagement and Montandon access with UNOSAT.
+The composite-score implementation itself, combining the exposure output of Use Case 1, the
 impact output of Use Case 2, INFORM vulnerability data, and Montandon's historical/operational record,
 remains designed but unbuilt, and is no longer tied to a near-term date; it is longer-term WP2 execution
 work, to be revisited in light of whatever the Utility Report finds. Several components described in the
@@ -86,16 +87,15 @@ via a planned IFRC Emergency Operations Centre connection) and should not be rea
 ## 2.4 CEMS and Charter ETL pipelines
 
 Use Case 2 depends on Copernicus EMS and International Charter hazard and response data being loaded
-into Montandon. This is not yet the case on staging, though both pipelines are in active development and
-close to landing. Use Case 3, in its near-term, externally-led form (Section 2.3), does not depend on
+into Montandon. Copernicus EMS has now reached staging; Charter has not yet, though it is close, and
+neither is yet in production. Use Case 3, in its near-term, externally-led form (Section 2.3), does not depend on
 this: the proposed partner engagement is explicitly designed to use Montandon's database irrespective of
 whether Charter-sourced content is itself present.
 
 **Copernicus EMS.** The transformer that converts CEMS Rapid Mapping products into Montandon STAC items is
 implemented and merged in `pystac-monty`, and has received several rounds of fixes this past week
-(correcting related-item links and relaxing overly strict event matching). Deploying it as a running
-pipeline is progressing quickly: CEMS data is now flowing into the alpha environment, and staging is
-hoped for around 11 September 2026, ahead of the Readiness Review meeting.
+(correcting related-item links and relaxing overly strict event matching). CEMS data is now flowing on
+staging. Production deployment is still in progress, with no confirmed date yet.
 
 **International Charter.** The transformer is implemented and merged in `pystac-monty`, built against a
 detailed, reviewed implementation specification. The `montandon-etl` integration, under way since 26 June
@@ -110,8 +110,9 @@ eoAPI's queryables so it can be used as a search filter, is tracked as
 [monty-stac-extension#147](https://github.com/IFRCGo/monty-stac-extension/issues/147).
 
 **What this means for Use Case 2.** It can be developed and unit-tested against the worked examples
-already in `monty-stac-extension`, but cannot yet be run against a live, currently-correlated Montandon event on staging until
-CEMS's staging deployment lands (imminently) or Charter's (expected mid-to-late-September
+already in `monty-stac-extension`. With CEMS now on staging, it can be run there against a live,
+currently-correlated Montandon event; a full production run awaits CEMS's production deployment.
+Charter-sourced events remain unavailable until Charter reaches staging (expected mid-to-late September
 2026). This is the most direct near-term dependency for validating Use Case 2 end to end (Section 4.1).
 Use Case 3's near-term Utility Report activity (Section 2.3) has no such dependency.
 

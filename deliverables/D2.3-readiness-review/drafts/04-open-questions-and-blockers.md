@@ -28,20 +28,22 @@ than a build, or an informal Charter-user review, the proposal from the ESA proj
 a third-party partner already active in a Charter activation, on a best-effort, non-committal basis, to
 assess Montandon's data directly, irrespective of whether Charter-sourced content is itself present, and
 produce a Utility Report on its relevance, fitness for purpose, and recommendations for future
-improvement. UNOSAT, as Charter Project Manager for the current large-scale activation in Nepal, is the
-leading candidate partner, and a Nepal activation with Red Cross involvement would additionally allow
-linking National Society engagement to the results. This removes UC3's near-term dependency on Use Cases 1 and 2 stabilising, and on CEMS or Charter
+improvement. UNOSAT, as Charter Project Manager for the current large-scale activation in Nepal, is
+effectively confirmed as the partner; whether that activation also involves Red Cross or Red Crescent,
+which would additionally allow linking National Society engagement to the results, is still being
+explored. This removes UC3's near-term dependency on Use Cases 1 and 2 stabilising, and on CEMS or Charter
 data reaching Montandon (Section 4.2); building the composite prioritisation score itself (Section 2.3)
 remains longer-term WP2 execution work, to be revisited in light of the Utility Report's findings.
 
-## 4.2 Cross-cutting: CEMS and Charter data not yet on production
+## 4.2 Cross-cutting: CEMS and Charter data not yet in production
 
 Use Case 2 needs Copernicus EMS and Charter hazard/response data in Montandon to validate against real
-events; neither is on production yet, though both are close (Section 2.4). (Use Case 3's near-term Utility
-Report activity does not need this: see Section 4.1.) Both transformers are
-implemented and merged in `pystac-monty`, with active bug-fixing this week (related-link and
-event-matching fixes for CEMS). CEMS data is now flowing in the alpha environment, with production hoped
-for around 11 September 2026; Charter is expected on staging roughly a week later, around 17 September 2026. Neither is blocked on design; both are normal integration and review work nearing completion.
+events; neither is in production yet, though CEMS is now on staging and Charter is close behind
+(Section 2.4). (Use Case 3's near-term Utility Report activity does not need this: see Section 4.1.) Both
+transformers are implemented and merged in `pystac-monty`, with active bug-fixing this week (related-link
+and event-matching fixes for CEMS). CEMS data is now flowing on staging, with production deployment in
+progress and no confirmed date yet; Charter is expected on staging around 17 September 2026. Neither is
+blocked on design; both are normal integration and review work nearing completion.
 
 **pystac-monty versioning.** Separately, a small number of `pystac-monty` changes, including item
 versioning, are implemented but not yet deployed to PROD. A follow-on item, adding the version field to
