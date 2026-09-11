@@ -18,12 +18,14 @@ downstream of WP1 and WP2. Its core piece is a notebook-publishing pipeline with
 3. Compiling it to a static site, and;
 4. Distributing the result.
 
-Two of the
-four, notebook generation and static-site compilation, have been tested to work with WP2's Use Case 1 notebook, parameterised by country and published as a
-working example. This is a concrete validation of the platform's central mechanism. The other two,
-triggering beyond WP2's existing automated events, and distribution, are not yet built. Rather than
-committing to a specific orchestration technology now, this report identifies the four pieces and
-assesses confidence in each individually.
+Two of the four, notebook generation and static-site compilation, are already running in production via
+WP2's Use Case 1 notebook, parameterised by country and published as a working example. This is a
+concrete, stress-tested validation of the platform's central mechanism: the underlying pattern is sound,
+even though the current notebook's own content is rough and due to be recreated for a more polished
+result. The other two, triggering beyond WP2's existing automated events, and distribution, are not yet
+built; both have low-effort fallbacks that bound their worst case (Section 4). Rather than committing to
+a specific implementation technology now, this report identifies the four pieces and assesses confidence
+in each individually.
 
 The three other WP3 deliverables are downstream of this platform and of the WP2 use-case notebooks
 (D2.3), and none has started in earnest:
@@ -34,17 +36,21 @@ The three other WP3 deliverables are downstream of this platform and of the WP2 
 - **Training material (D3.1):** not started; planned to begin in October, once user-facing notebooks
   and stakeholder consultations exist to train against.
 - **Technical documentation for ESA JupyterLab integration (D3.2):** not started.
-- **User demonstration with IFRC (D3.4):** not started; depends on the above three.
+- **User demonstration with IFRC (D3.4):** not started; depends on the above three, though talks with
+  IFRC and National Societies about demonstrating Montandon are already under way.
 
 ## Confidence
 
-Confidence in the notebook-publishing pipeline is high overall, and uneven across its four pieces:
+Confidence in the notebook-publishing pipeline is medium-high overall, and uneven across its four pieces:
 high for notebook generation and static-site compilation, already working in production for WP2's Use
-Case 1, and lower for triggering and distribution, which are undesigned. Authentication is proposed for this piece to allow authenticated users to "self-service" their own notebook runs, but is not essential.
-Confidence in the training, documentation, and demonstration deliverables landing in
-finished form by their nominal dates is medium, because each depends on artifacts, stable use-case
-notebooks, a working publishing platform, that do not yet exist. Given the December deadline, this is a
-sequencing risk, not a design risk or a cause for concern.
+Case 1, and medium for triggering and distribution, which are undesigned but have low-effort fallbacks.
+Authentication for the triggering piece is expected to serve a small, trusted group of users authoring or
+forking notebooks, not a large open user base, and has a fallback that needs no external identity
+integration at all (Section 4.2), so it is not a source of major risk. Confidence in the training,
+documentation, and demonstration deliverables landing in finished form by their nominal dates ranges from
+medium to medium-high: each depends on artefacts, stable use-case notebooks, a working publishing
+platform, that do not yet exist, but that is a sequencing question, not a judgement that they will not
+land by December.
 
 ## What this report covers
 

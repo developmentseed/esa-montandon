@@ -28,8 +28,8 @@ The core proposal, detailed in Section 2, is a notebook-publishing pipeline with
 triggering, notebook generation, static-site compilation, and access/distribution, that together let a
 defined set of users:
 
-- select an **analysis notebook template** (an exposure, impact, or prioritization notebook from WP2)
-  and the parameters it takes (e.g., country, administrative area, hazard, data source, etc.);
+- select an **analysis notebook template** (an exposure, impact, or prioritisation notebook from WP2)
+  and the parameters it takes (for example, country, administrative area, hazard, or data source);
 - **trigger a run**, which executes the notebook against those parameters and publishes the result as a
   static, shareable output;
 - **browse and discover** previously generated analyses by country, administrative area, or event; and,
@@ -41,7 +41,7 @@ own terms, and Section 4 keeps the open design questions that shape whichever im
 eventually chosen.
 
 This is built on the same modular-notebook model established by WP2's automated analysis pipeline
-(deliverable D2.2): the notebooks this platform runs are the same artifacts, or close relatives of them,
+(deliverable D2.2): the notebooks this platform runs are the same artefacts, or close relatives of them,
 that WP2's event-driven pipeline runs automatically. WP3 adds the human-driven, on-demand counterpart to
 WP2's event-driven automation.
 

@@ -12,7 +12,7 @@ and clear remaining steps is rated higher here than raw "lines of code shipped" 
 | Use case                | Build status                                                                                                     | Confidence in reaching demonstrable state | Basis                                                                                                                                                   |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | UC1 — Risk Exposure     | Built: 3 of 4 hazards, parameterised, published                                                                  | **High**                                  | Working, published notebooks exist today; the remaining baseline-compute decision is scoping and notebook design                                        |
-| UC2 — Impact Estimation | Built by MapAction, opened for review                                                                            | **Medium-high**                           | Follows a proven, now twice-validated pattern from UC1; unvalidated against a real event, partly because CEMS/Charter data is not yet on staging        |
+| UC2 — Impact Estimation | Built by MapAction, opened for review                                                                            | **Medium-high**                           | Follows a proven, now twice-validated pattern from UC1; unvalidated against a real event, partly because CEMS/Charter data is not yet in production (CEMS is now on staging, Charter is not)        |
 | UC3 — Utility Report    | Reframed as an externally-led Utility Report (best-effort, non-committal); partner and activation decided (UNOSAT, Nepal), engagement terms being finalised | **Medium-high**                           | No engineering risk and no dependency on UC1/UC2 or the CEMS/Charter timeline; the only real uncertainty is whether a best-effort, non-committal partner delivers |
 
 ## Basis for the assessment
@@ -23,9 +23,12 @@ remains is concentrated in three places: getting real CEMS and Charter data into
 reached staging; Charter has not), a small number of open scoping decisions (Section 4), and finalising
 engagement terms for UC3's external partner, UNOSAT.
 
-Use Case 1 can reasonably be shown working end to end at the Readiness Review meeting; it already is,
-in a published form. However, use case one is still in a "proof of concept" state and requires refinement. Use Case 2 is close behind, gated mainly by real-event validation rather than by
-anything substantial to build. Use Case 3 is no longer on a build cycle for this near-term
+Use Case 1 can reasonably be shown working end to end at the Readiness Review meeting; it already is, in
+published form, with the underlying parameterised-notebook and publishing pattern proven and
+stress-tested. The current notebook's content itself is still rough and will need to be recreated to be
+more polished and impactful; that is a content gap, not an architecture risk, and does not lower
+confidence in the pattern itself. Use Case 2 is close behind, gated mainly by real-event validation
+rather than by anything substantial to build. Use Case 3 is no longer on a build cycle for this near-term
 checkpoint at all: its reframed near-term form is an external partner's assessment of Montandon,
 decoupled from UC1/UC2 status and from the CEMS/Charter ETL timeline. This removes most of the
 sequencing risk the earlier framing carried; what remains is finalising engagement terms with UNOSAT,

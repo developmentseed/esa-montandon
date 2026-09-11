@@ -7,7 +7,7 @@ substantial engineering investment in the trigger/orchestration piece (Section 2
 the data model or the operating model rather than an implementation detail:
 
 1. **How frequently will users create new notebook templates**, as opposed to running existing ones?
-   This determines how much the authoring workflow needs to optimize for: a rare, heavier-weight
+   This determines how much the authoring workflow needs to optimise for: a rare, heavier-weight
    activity for a small trusted group looks different from a frequent one needing a smoother UI.
 2. **How frequently will users copy and run a template** for a new area or event? This determines
    compute and job-queue sizing, and whether pre-computation (see the baseline-strategy question in
@@ -25,6 +25,10 @@ proceed on reasonable defaults. They should be explicitly discussed and provisio
 than left implicit, since the answers change the shape of the trigger/orchestration piece's data model,
 in particular whether "published" status is a first-class field from day one.
 
+**Current expectation.** The working assumption for questions 1 and 2 is a small number of trusted users
+authoring notebooks, or forking an existing one for a new country, rather than a large open user base.
+This should keep the authoring workflow and its authentication needs modest in scope (Section 4.2).
+
 ## 4.2 Authentication approach
 
 The request for this platform includes a light authoring and authentication layer so that select users
@@ -34,8 +38,11 @@ IFRC's `go.ifrc.org` platform, and this is already the mechanism IFRC users use 
 access Montandon data from notebooks. The straightforward path is for the trigger/orchestration piece to delegate
 authentication to that same identity provider, rather than building or maintaining a separate user
 store, restricting the authoring capability (as opposed to browsing published results) to a defined set
-of authorized accounts within it. This is a design recommendation, not yet a confirmed decision, and
-should be validated with whoever owns that identity platform on the IFRC side.
+of authorised accounts within it. This is a design recommendation, not yet a confirmed decision, and
+should be validated with whoever owns that identity platform on the IFRC side. There is also a
+lower-effort fallback if time runs short: trigger runs manually via GitHub, with the project team as the
+only authenticated users, needing no external identity integration at all. Either path keeps this piece
+low-risk.
 
 ## 4.3 Shared dependency: baseline data strategy
 

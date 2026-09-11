@@ -28,7 +28,11 @@ parameter-driven form. That exploration informed the current direction, but the 
 path above is the one being carried forward; Streamlit is not expected to be the long-term interface.
 
 **What remains.** The baseline-computation strategy question in Section 4: how, and how often, this use
-case's outputs are computed and published, independent of interface.
+case's outputs are computed and published, independent of interface. Separately, while the
+parameterised-notebook and publishing pattern is proven and stress-tested, for example the Kenya instance
+at [manywidgets-playground/data-visualization-ken](https://developmentseed.org/manywidgets-playground/data-visualization-ken/),
+the notebook's own content is still rough and will need to be recreated to be more polished and
+impactful. That is a content gap, not an architecture risk.
 
 ## 2.2 Use Case 2 — Post-disaster Impact Estimation
 

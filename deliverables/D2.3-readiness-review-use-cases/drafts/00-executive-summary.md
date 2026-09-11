@@ -18,8 +18,10 @@ Progress is uneven across the three use cases, which is expected. Each is furthe
 underlying repositories alone would suggest.
 
 - **Use Case 1 (Risk Exposure)** is furthest along. MapAction has delivered baseline exposure-calculation
-  notebooks covering three out four planned hazards (flood, cyclone, earthquake with wildfire under development), parameterised
-  so the same notebook runs for any country, and published as a working example.
+  notebooks covering three out of four planned hazards (flood, cyclone, earthquake, with wildfire under
+  development), parameterised so the same notebook runs for any country, and published as a working,
+  stress-tested example; the notebook's own content is still rough and will be recreated for a more
+  polished result.
 - **Use Case 2 (Impact Estimation)** has an initial notebook implementation, built by MapAction, opened
   for review this week. It has not yet been run against a live event end to end, and the Copernicus EMS
   and Charter data it depends on is not yet flowing into Montandon (see below).

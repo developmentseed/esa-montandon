@@ -41,9 +41,9 @@ dependency chain rather than starting deliverables in parallel that are not yet 
 ## Phase 4 — Demonstration (December 2026, or as training and platform maturity allow)
 
 11. **Run the IFRC user demonstration (D3.4)**, once training material (D3.1) and the platform (D3.3)
-    are both far enough along to support a meaningful session with real National Society users, ideally
-    incorporating the same National Societies interviewed during WP2's consultation round (D2.3, Section
-    4.5) for continuity.
+    are both far enough along to support a meaningful session with real National Society users. Talks
+    with IFRC and National Societies are already under way, ideally incorporating the same National
+    Societies interviewed during WP2's consultation round (D2.3, Section 4.5) for continuity.
 
 ## Ongoing
 
@@ -55,4 +55,7 @@ dependency chain rather than starting deliverables in parallel that are not yet 
 
 D3.1, D3.2, and D3.4 are deliberately not started in parallel with Phase 1, since each depends on
 artefacts that do not yet exist; starting them early would mean redoing that work once the platform's
-shape is known. This plan is scoped for the fastest realistic path to a working, demonstrated system.
+shape is known. The exception is participant engagement itself: conversations with IFRC and National
+Societies about the eventual demonstration are already under way, independent of platform readiness, so
+Phase 4's tight December window is partly de-risked before it starts. This plan is scoped for the fastest
+realistic path to a working, demonstrated system.
