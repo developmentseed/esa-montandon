@@ -32,8 +32,8 @@ WP2's deliverable chain builds progressively:
 
 For each use case, this report assesses readiness along three dimensions:
 
-1. **Build status** — what notebooks, applications, and data pipelines exist today, evidenced by merged
-   or open pull requests and by the state of the underlying data.
+1. **Build status** — what notebooks, applications, and data pipelines exist today, evidenced by
+   completed or in-progress engineering work and by the state of the underlying data.
 2. **Validation status** — whether the use case has been run against a real or realistic event, and
    whether it has been reviewed by IFRC or MapAction domain experts.
 3. **Path to demonstrable** — what remains before the use case could be shown to an IFRC user as a

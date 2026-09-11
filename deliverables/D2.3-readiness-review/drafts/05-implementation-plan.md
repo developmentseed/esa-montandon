@@ -13,8 +13,8 @@ window, since there is runway to do them properly.
    pre-computed dataset is cheaper to serve and keeps published outputs consistent. This is a decision,
    not new engineering, and should be made this week.
 2. **Confirm Copernicus EMS reaches staging** (Section 4.2), hoped for around 11 September 2026, ahead of
-   the meeting. This is now a matter of completing an in-flight deployment rather than merging a stalled
-   PR; Charter follows about a week later, around 17 September 2026.
+   the meeting. This is now a matter of completing an in-flight deployment rather than resolving a
+   stalled integration; Charter follows about a week later, around 17 September 2026.
 3. **Run UC2 end to end against the resulting live event**, once CEMS (or Charter) is live on staging,
    and get it reviewed by an IFRC or MapAction domain expert. This is the single most valuable step to
    move UC2 from built to validated before the meeting.
@@ -27,11 +27,13 @@ window, since there is runway to do them properly.
 
 ## Short-term (through end of September 2026)
 
-6. **Communicate UC3's near-term scope decision** (Section 4.1) to stakeholders: a Charter-user
-   (UNOSAT/ESA) review of Montandon rather than a build, so effort is not spent on implementation the
-   plan no longer calls for at this stage.
-7. **Coordinate the Charter-user review** with UNOSAT and ESA: share Montandon access and the D2.4 UC3
-   narrative, and agree a timeline for their report.
+6. **Communicate UC3's reframed near-term scope** (Section 4.1) to stakeholders: an externally-led,
+   best-effort Utility Report rather than a build or an informal review, so effort is not spent on
+   implementation the plan no longer calls for at this stage.
+7. **Confirm the UC3 partner and Charter activation**: follow up on UNOSAT as the leading candidate for
+   the current Nepal mega-activation, check whether a Red Cross-involved activation (ideally Nepal
+   itself) is feasible for the added National Society linkage, and agree best-effort, non-committal
+   engagement terms and Montandon access, so the partner can start producing the Utility Report.
 8. **Confirm Charter reaches staging** (the second of the two CEMS/Charter ETL pipelines), so both
    sources are loading into Montandon well ahead of December. Separately, deploy the pending
    `pystac-monty` versioning changes to PROD and progress
@@ -46,8 +48,9 @@ window, since there is runway to do them properly.
 10. **Complete the National Society interview round** and feed findings back into use-case refinement,
     particularly if any interviewed National Society flags a use case as lower-priority or surfaces a
     need the current three do not cover.
-11. **Build out the historical-burden and operational-gap components of UC3**, if deferred per item 7,
-    once UC1 and UC2 are stable and validated.
+11. **Build out the composite-score implementation for UC3**, informed by the Utility Report's findings
+    (item 7), once UC1 and UC2 are stable and validated. This remains longer-term WP2 execution work
+    with no near-term date.
 12. **Resolve the statistics-export question** (Section 4.4) as the aggregate-reporting need becomes
     concrete, most plausibly once `montandondata.org`'s public reporting requirements are firmer.
 
@@ -57,8 +60,9 @@ Database remediation is owned within the platform engineering effort, currently 
 access; escalating that access is itself an action item for this plan. The CEMS and Charter
 `montandon-etl` integrations each already have an assigned author and reviewer; completing their staging
 deployment is a review and testing task, not new design work. UC1 and UC2 notebook and application work
-is owned by MapAction, with Development Seed supporting infrastructure and hosting. UC3 notebook
-development follows the same pattern once started, and its near-term Charter-user review is owned
-jointly with UNOSAT and ESA. A single decision-owner should be named for the baseline-computation
-strategy (item 1) at the Readiness Review meeting, since it is the one major open question remaining;
-UC3's near-term scope (item 6) is now decided and needs only confirmation and coordination.
+is owned by MapAction, with Development Seed supporting infrastructure and hosting. UC3's eventual
+composite-score build follows the same pattern once started; its near-term Utility Report is owned by
+the ESA project manager, who is leading partner and activation selection (UNOSAT/Nepal is the leading
+candidate). A single decision-owner should be named for the baseline-computation strategy (item 1) at the
+Readiness Review meeting, since it is the one major open question remaining; UC3's near-term approach
+(item 6) is decided in principle, with partner and activation confirmation (item 7) the only open step.

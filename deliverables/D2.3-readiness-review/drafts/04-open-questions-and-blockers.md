@@ -23,17 +23,23 @@ against a live or recent Copernicus EMS or Charter activation, nor reviewed by a
 gated in part by Section 4.2 below: there is not yet a live CEMS or Charter event in Montandon to run it
 against. This is the highest-priority item before Use Case 2 can be called demonstrable.
 
-**UC3 — scope decided: review over build.** This is now resolved. Rather than a full working
-implementation or a narrower build slice, the near-term target is a specified-but-not-built status,
-validated through review rather than implementation: International Charter users — UNOSAT and ESA — will
-review Montandon directly and provide a report. This substitutes domain-expert review for engineering
-effort as the near-term validation step; building the composite prioritisation score itself (Section 2.3)
-remains future WP2 execution work, and still depends on two use cases that are not yet stable.
+**UC3 — reframed as an externally-led Utility Report.** The near-term target has changed again: rather
+than a build, or an informal Charter-user review, the proposal from the ESA project manager is to engage
+a third-party partner already active in a Charter activation, on a best-effort, non-committal basis, to
+assess Montandon's data directly, irrespective of whether Charter-sourced content is itself present, and
+produce a Utility Report on its relevance, fitness for purpose, and recommendations for future
+improvement. UNOSAT, as Charter Project Manager for the current large-scale activation in Nepal, is the
+leading candidate partner, and a Nepal activation with Red Cross involvement would additionally allow
+linking National Society engagement to the results; neither the partner nor the activation is confirmed
+yet. This removes UC3's near-term dependency on Use Cases 1 and 2 stabilising, and on CEMS or Charter
+data reaching Montandon (Section 4.2); building the composite prioritisation score itself (Section 2.3)
+remains longer-term WP2 execution work, to be revisited in light of the Utility Report's findings.
 
 ## 4.2 Cross-cutting: CEMS and Charter data not yet on staging
 
-Use Cases 2 and 3 need Copernicus EMS and Charter hazard/response data in Montandon to validate against
-real events; neither is on staging yet, though both are close (Section 2.4). Both transformers are
+Use Case 2 needs Copernicus EMS and Charter hazard/response data in Montandon to validate against real
+events; neither is on staging yet, though both are close (Section 2.4). (Use Case 3's near-term Utility
+Report activity does not need this: see Section 4.1.) Both transformers are
 implemented and merged in `pystac-monty`, with active bug-fixing this week (related-link and
 event-matching fixes for CEMS). CEMS data is now flowing in the alpha environment, with staging hoped
 for around 11 September 2026; Charter is expected on staging roughly a week later, around 17 September
@@ -43,8 +49,8 @@ for around 11 September 2026; Charter is expected on staging roughly a week late
 versioning, are implemented but not yet deployed to PROD. A follow-on item, adding the version field to
 eoAPI's queryables so users can filter by transformer version, is tracked as
 [monty-stac-extension#147](https://github.com/IFRCGo/monty-stac-extension/issues/147). Neither is a
-blocker for Use Case 2 or 3 today, but both should land before those use cases are treated as fully
-reproducible.
+blocker for Use Case 2 today, or for Use Case 3's near-term Utility Report; both should land before
+Montandon's data is treated as fully reproducible for Use Case 3's eventual build.
 
 ## 4.3 Cross-cutting: Montandon platform performance
 

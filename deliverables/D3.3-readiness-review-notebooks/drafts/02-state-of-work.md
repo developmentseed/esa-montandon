@@ -29,15 +29,16 @@ interface for the same use case but is not expected to carry forward.
 
 **Triggers and access/distribution are not yet built.** The automated-event trigger is proven, reused
 directly from WP2's pipeline (D2.2); manual and scheduled triggering are not, and need a backing service
-and a light UI, which is where the earlier Django/Celery proposal lived — that proposal's specifics
+and a light UI, which is where the earlier Django/Celery proposal lived; that proposal's specifics
 remain reasonable direction but are not a locked-in decision. On the distribution side, a live URL for a
 published static site already exists for Use Case 1; email notification and external-platform
 integration are undesigned, with no specification yet.
 
 Of the three use cases (risk exposure, impact estimation, response prioritisation; see D2.3), Use Case 1
 and Use Case 2 are already built and would run through the notebook-generation and static-site pieces as
-templates once a trigger exists; Use Case 3 will follow once built, which per D2.3's Section 4.1 is now
-planned after a Charter-user (UNOSAT/ESA) review of Montandon rather than immediately.
+templates once a trigger exists; Use Case 3 will follow once built. Per D2.3's Section 2.3, its
+near-term activity is now an externally-led Utility Report rather than a build, so it has no near-term
+template to register here.
 
 **What remains.** Designing and building the trigger/orchestration piece, and generalising static-site
 compilation and distribution beyond the single Use Case 1 path. Four specific design questions remain
