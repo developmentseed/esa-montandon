@@ -24,15 +24,22 @@ ahead of drafting.
 
 ## What "the notebook-publishing platform" means
 
-The core proposal, detailed in Section 2, is a Django application that lets a defined set of users:
+The core proposal, detailed in Section 2, is a notebook-publishing pipeline with four functional pieces,
+triggering, notebook generation, static-site compilation, and access/distribution, that together let a
+defined set of users:
 
 - select an **analysis notebook template** (an exposure, impact, or prioritisation notebook from WP2)
   and the parameters it takes (administrative area, hazard, data source, and so on);
-- **trigger a run**, which executes the notebook against those parameters as a background job and
-  publishes the result as a static, shareable output;
+- **trigger a run**, which executes the notebook against those parameters and publishes the result as a
+  static, shareable output;
 - **browse and discover** previously generated analyses by country, administrative area, or event; and,
   for select authorised users,
 - **author new notebooks from a template**, rather than only running existing ones.
+
+This report deliberately does not commit to a specific implementation for these pieces (an earlier draft
+proposed Django, Celery, and Kubernetes specifically); Section 2 assesses each piece's readiness on its
+own terms, and Section 4 keeps the open design questions that shape whichever implementation is
+eventually chosen.
 
 This is built on the same modular-notebook model established by WP2's automated analysis pipeline
 (deliverable D2.2): the notebooks this platform runs are the same artefacts, or close relatives of them,

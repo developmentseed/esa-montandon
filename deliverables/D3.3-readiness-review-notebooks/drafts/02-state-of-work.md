@@ -1,47 +1,48 @@
 # State of Work
 
-## 2.1 Notebook-publishing architecture (D3.3 core)
+## 2.1 Notebook-publishing pipeline (D3.3 core)
 
-**Status: architecture proposed and discussed; core pattern already validated by WP2; Django
-implementation not started.**
+**Status: four core pieces identified; notebook generation and static-site compilation are already
+running in production; triggering and distribution are not yet built.**
 
-The proposed design was written up in detail by the team, grounded in the original MapAction use-cases
-document and iterated into a walkthrough site outlining the architecture end to end. The tracking issue
-remains open with no linked Django/Celery implementation work.
+An earlier draft of this report proposed a specific architecture: a Django orchestration app, a Celery
+job queue, and Kubernetes execution. That level of commitment is more than this checkpoint needs. This
+report instead identifies the pipeline's core functional pieces and assesses confidence in each
+individually (Section 3), leaving the specific orchestration technology as an implementation choice
+rather than a fixed design decision at this stage. The four pieces, in the order a run passes through
+them, are:
 
-The proposed architecture is:
+1. **Triggers** — what starts a run: a WP2 automated event (for example, a flood-event threshold being
+   met), a user's manual parameter selection, or a scheduled job.
+2. **Notebook generation** — parameter extraction and a papermill run of the chosen notebook template,
+   producing a parameterised notebook output.
+3. **Static site compilation** — a MyST/Jupyter Book build of the notebook output into static HTML.
+4. **Access and distribution** — a hosted, permanent URL, plus onward distribution such as email
+   notification and integration into external platforms (for example, IFRC's GO platform).
 
-- A **Django application** as the orchestration and indexing layer. It stores lightweight metadata
-  (which notebook, which parameters, who ran it, when) but not notebook content itself.
-- A **Celery worker queue**, so triggering a run does not block the user. A job is queued, executed, and
-  its result recorded.
-- **papermill** to execute the chosen notebook template with the user-supplied parameters, following
-  the same pattern WP2's automated pipeline already uses for event-triggered runs.
-- Rendering to **static HTML** (via MyST), published to **object storage**, so that browsing a finished
-  analysis is a cheap, cacheable static-file fetch rather than a live app request.
-- **Kubernetes** for execution, reusing the same job-based, resource-bounded execution pattern already
-  operating in WP2's pipeline.
+**Notebook generation and static site compilation are already running in production**, via WP2's Use
+Case 1: its data-preparation, exposure-calculation, and visualisation notebooks take a country parameter
+and run end to end via papermill, validated for more than one country, and the output is published to a
+live MyST site (D2.3, Section 2.1). This proves the platform's central mechanism, pieces 2 and 3 above,
+well ahead of building anything else around it. An earlier Streamlit prototype explored a guided-form
+interface for the same use case but is not expected to carry forward.
 
-This design does not introduce new infrastructure. It composes Django, Celery, and Kubernetes, all
-either already used elsewhere in this stack or standard, well-understood tools, around the same
-notebook-as-interchangeable-object model WP2 already validated. Of the three use cases (risk exposure,
-impact estimation, response prioritisation; see D2.3), Use Case 1 and Use Case 2 are already built and
-map directly onto this platform as templates; Use Case 3 will follow once built, which per D2.3's Section
-4.1 is now planned after a Charter-user (UNOSAT/ESA) review of Montandon rather than immediately.
+**Triggers and access/distribution are not yet built.** The automated-event trigger is proven, reused
+directly from WP2's pipeline (D2.2); manual and scheduled triggering are not, and need a backing service
+and a light UI, which is where the earlier Django/Celery proposal lived — that proposal's specifics
+remain reasonable direction but are not a locked-in decision. On the distribution side, a live URL for a
+published static site already exists for Use Case 1; email notification and external-platform
+integration are undesigned, with no specification yet.
 
-**Proof of concept, already in production.** The core user-facing pattern this platform is meant to
-generalise, parameterise a notebook, run it via papermill, publish the result as static HTML, is not
-hypothetical: WP2's Use Case 1 notebooks already work exactly this way. The data-preparation,
-exposure-calculation, and visualisation notebooks take a country parameter and run end to end via
-papermill, validated for more than one country, and the output is published to a live MyST site
-(D2.3, Section 2.1). This de-risks the platform's central mechanism well ahead of building the Django
-orchestration layer around it. An earlier Streamlit prototype explored a guided-form interface for the
-same use case but is not expected to carry forward.
+Of the three use cases (risk exposure, impact estimation, response prioritisation; see D2.3), Use Case 1
+and Use Case 2 are already built and would run through the notebook-generation and static-site pieces as
+templates once a trigger exists; Use Case 3 will follow once built, which per D2.3's Section 4.1 is now
+planned after a Charter-user (UNOSAT/ESA) review of Montandon rather than immediately.
 
-**What remains.** The Django orchestration layer itself: no Django project, Celery configuration, or
-authoring UI exists yet. Four specific design questions remain open (Section 4) and should be resolved
-before significant engineering investment, since they affect the shape of the data model and the compute
-strategy.
+**What remains.** Designing and building the trigger/orchestration piece, and generalising static-site
+compilation and distribution beyond the single Use Case 1 path. Four specific design questions remain
+open (Section 4) and should be resolved before committing to an implementation for the trigger
+piece, since they affect its data model and compute strategy.
 
 ## 2.2 Training material for relevant user communities (D3.1)
 
@@ -82,6 +83,6 @@ Section 5 and are worth noting:
   Context Protocol) service exposing Montandon's event, hazard, and impact data for natural-language
   querying, has been built and deployed, evolved from an earlier Claude-Code-specific skill pack into a
   standard toolset served on Kubernetes. This is not currently scoped as a formal WP3 sub-deliverable,
-  but it demonstrates a second, complementary "interactive access" pattern alongside the Django
-  platform, and is worth including in the WP3 narrative for the Readiness Review meeting as evidence of
-  momentum on the access-patterns side of this work package.
+  but it demonstrates a second, complementary "interactive access" pattern alongside the
+  notebook-publishing pipeline, and is worth including in the WP3 narrative for the Readiness Review
+  meeting as evidence of momentum on the access-patterns side of this work package.

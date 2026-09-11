@@ -1,8 +1,8 @@
 # Implementation Plan
 
-This plan phases WP3 from its current state, a validated core pattern with the Django layer not yet
-built, to a working, demonstrated platform. It is sequenced around WP3's dependency chain rather than
-starting deliverables in parallel that are not yet actionable.
+This plan phases WP3 from its current state, two of the four pipeline pieces validated and the trigger
+and distribution pieces not yet built, to a working, demonstrated platform. It is sequenced around WP3's
+dependency chain rather than starting deliverables in parallel that are not yet actionable.
 
 ## Phase 1 — Resolve open questions and stand up a minimal skeleton (through September 2026)
 
@@ -11,12 +11,13 @@ starting deliverables in parallel that are not yet actionable.
 2. **Decide the baseline-computation strategy** jointly with D2.3's Section 5, item 1. This one
    decision simplifies both WP2's Use Case 1 delivery and this platform's data model.
 3. **Confirm the authentication approach** (Section 4.2) with the owner of IFRC's identity platform,
-   and design the Django app's user/permission model around delegated authentication from day one
-   rather than retrofitting it.
-4. **Stand up a minimal Django + Celery + papermill skeleton** that can run one existing WP2 notebook
-   (the most stable of the three use cases; see D2.3) end to end: select parameters, queue a job,
-   produce a static output. This is deliberately narrow in scope, one notebook, one hazard, to prove
-   the pattern before generalising it.
+   and design the trigger/orchestration piece's user/permission model around delegated authentication
+   from day one rather than retrofitting it.
+4. **Stand up a minimal, end-to-end version of the four pipeline pieces** (Section 2.1) that can run one
+   existing WP2 notebook (the most stable of the three use cases; see D2.3): select parameters, run the
+   notebook, compile it to a static site, publish it. This is deliberately narrow in scope, one
+   notebook, one hazard, to prove the trigger and distribution pieces before generalising them, without
+   committing yet to a specific job-queue or execution technology.
 
 ## Phase 2 — First official templates and training content in parallel (October–November 2026)
 

@@ -3,8 +3,8 @@
 ## 4.1 Four open architecture questions (D3.3 core)
 
 Four questions, raised during design discussion, remain unresolved and should be answered before
-substantial engineering investment in the Django platform, since each shapes the data model or the
-operating model rather than an implementation detail:
+substantial engineering investment in the trigger/orchestration piece (Section 2.1), since each shapes
+the data model or the operating model rather than an implementation detail:
 
 1. **How frequently will users create new notebook templates**, as opposed to running existing ones?
    This determines how much the authoring workflow needs to optimise for: a rare, heavier-weight
@@ -22,8 +22,8 @@ operating model rather than an implementation detail:
 
 These do not need certain answers before any engineering starts; a first, minimal implementation can
 proceed on reasonable defaults. They should be explicitly discussed and provisionally answered rather
-than left implicit, since the answers change the shape of the Django data model, in particular whether
-"published" status is a first-class field from day one.
+than left implicit, since the answers change the shape of the trigger/orchestration piece's data model,
+in particular whether "published" status is a first-class field from day one.
 
 ## 4.2 Authentication approach
 
@@ -31,7 +31,7 @@ The request for this platform includes a light authoring and authentication laye
 can create notebooks. This is lower-risk than it might first appear: Montandon's own staging API already
 authenticates users via IFRC's existing OpenID Connect identity provider, issuing Bearer tokens through
 IFRC's `goadmin-stage.ifrc.org` platform, and this is already the mechanism IFRC users use today to
-access Montandon data from notebooks. The straightforward path is for the Django platform to delegate
+access Montandon data from notebooks. The straightforward path is for the trigger/orchestration piece to delegate
 authentication to that same identity provider, rather than building or maintaining a separate user
 store, restricting the authoring capability (as opposed to browsing published results) to a defined set
 of authorised accounts within it. This is a design recommendation, not yet a confirmed decision, and
