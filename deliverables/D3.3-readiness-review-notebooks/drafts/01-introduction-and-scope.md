@@ -4,7 +4,7 @@
 
 This document is deliverable D3.3 — Readiness Review Report of the Analytics Services Notebooks,
 produced under Work Package 3 of the ESA activity "Application Development concerning Disaster Data and
-Analytics" (SoW ESA-EOP-SG-OF-0779). It gives ESA, IFRC, MapAction, and Development Seed a shared
+Analytics". It gives ESA, IFRC, MapAction, and Development Seed a shared
 picture of readiness across WP3 ahead of the Readiness Review meeting.
 
 ## Why this report covers all of WP3, not only the notebook-publishing platform
@@ -28,21 +28,20 @@ The core proposal, detailed in Section 2, is a notebook-publishing pipeline with
 triggering, notebook generation, static-site compilation, and access/distribution, that together let a
 defined set of users:
 
-- select an **analysis notebook template** (an exposure, impact, or prioritisation notebook from WP2)
-  and the parameters it takes (administrative area, hazard, data source, and so on);
+- select an **analysis notebook template** (an exposure, impact, or prioritization notebook from WP2)
+  and the parameters it takes (e.g., country, administrative area, hazard, data source, etc.);
 - **trigger a run**, which executes the notebook against those parameters and publishes the result as a
   static, shareable output;
 - **browse and discover** previously generated analyses by country, administrative area, or event; and,
   for select authorised users,
 - **author new notebooks from a template**, rather than only running existing ones.
 
-This report deliberately does not commit to a specific implementation for these pieces (an earlier draft
-proposed Django, Celery, and Kubernetes specifically); Section 2 assesses each piece's readiness on its
+This report deliberately does not commit to a specific implementation for these pieces; Section 2 assesses each piece's readiness on its
 own terms, and Section 4 keeps the open design questions that shape whichever implementation is
 eventually chosen.
 
 This is built on the same modular-notebook model established by WP2's automated analysis pipeline
-(deliverable D2.2): the notebooks this platform runs are the same artefacts, or close relatives of them,
+(deliverable D2.2): the notebooks this platform runs are the same artifacts, or close relatives of them,
 that WP2's event-driven pipeline runs automatically. WP3 adds the human-driven, on-demand counterpart to
 WP2's event-driven automation.
 

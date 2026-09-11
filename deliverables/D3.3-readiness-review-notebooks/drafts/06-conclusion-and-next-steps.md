@@ -2,7 +2,7 @@
 
 ## Assessment outcome
 
-WP3 is at an early, design-and-planning stage, though its core mechanism is already validated in
+WP3 is at an early-to-middle stage, though its core mechanism is already validated in
 production through WP2's Use Case 1 notebooks. The notebook-publishing pipeline's core pieces are
 identified and individually assessed rather than proposed as one fixed architecture; two of the four
 (notebook generation, static-site compilation) are already proven in production, and the platform carries

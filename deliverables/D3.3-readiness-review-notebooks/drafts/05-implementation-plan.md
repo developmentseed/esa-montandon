@@ -38,7 +38,7 @@ dependency chain rather than starting deliverables in parallel that are not yet 
     notebook/environment contract is stable enough that the documentation will not need immediate
     rework.
 
-## Phase 4 — Demonstration (early 2027, or as training and platform maturity allow)
+## Phase 4 — Demonstration (December 2026, or as training and platform maturity allow)
 
 11. **Run the IFRC user demonstration (D3.4)**, once training material (D3.1) and the platform (D3.3)
     are both far enough along to support a meaningful session with real National Society users, ideally
