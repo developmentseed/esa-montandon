@@ -48,7 +48,7 @@ would be a direct input to Use Case 3's eventual composite score (Section 2.3), 
 a bearing on that longer-term build; it has no bearing on Use Case 3's near-term Utility Report activity,
 which is independent of UC1/UC2 status.
 
-## 2.3 Use Case 3 — Operational Response Prioritisation
+## 2.3 Use Case 3 — Utility Report
 
 **Status: reframed for this cycle as an externally-led Utility Report rather than a build; partner and
 activation decided (UNOSAT, Nepal), engagement terms being finalised.**
