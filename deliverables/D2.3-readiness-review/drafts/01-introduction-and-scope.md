@@ -3,7 +3,7 @@
 ## Purpose of this report
 
 This document is deliverable D2.3 — Readiness Review Report, produced under Work Package 2 of the ESA
-activity "Application Development concerning Disaster Data and Analytics" (SoW ESA-EOP-SG-OF-0779). It
+activity "Application Development concerning Disaster Data and Analytics". It
 is due ahead of the Readiness Review meeting and gives ESA, IFRC, MapAction, and Development Seed a
 shared picture of where WP2 execution stands: what is built, what is on track, and what is not.
 

@@ -12,10 +12,10 @@ window, since there is runway to do them properly.
    pre-computation, published to cloud storage) is recommended over recomputing on demand, since a
    pre-computed dataset is cheaper to serve and keeps published outputs consistent. This is a decision,
    not new engineering, and should be made this week.
-2. **Confirm Copernicus EMS reaches staging** (Section 4.2), hoped for around 11 September 2026, ahead of
+2. **Confirm Copernicus EMS reaches production** (Section 4.2), hoped for around 11 September 2026, ahead of
    the meeting. This is now a matter of completing an in-flight deployment rather than resolving a
    stalled integration; Charter follows about a week later, around 17 September 2026.
-3. **Run UC2 end to end against the resulting live event**, once CEMS (or Charter) is live on staging,
+3. **Run UC2 end to end against the resulting live event**, once CEMS (or Charter) is live on production,
    and get it reviewed by an IFRC or MapAction domain expert. This is the single most valuable step to
    move UC2 from built to validated before the meeting.
 4. **Progress the database remediation** (Section 4.3) as far as staging-cluster access allows; at

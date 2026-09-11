@@ -4,7 +4,7 @@ This section reports, for each use case, what has been built against the D2.4 us
 the D2.2 pipeline architecture it implements, plus the state of the underlying CEMS and Charter data
 pipeline Use Case 2 depends on. Evidence is drawn from the engineering and issue history of the relevant
 repositories (`esa-montandon`, `manywidgets-playground`, `pystac-monty`, `montandon-etl`) as of early
-September 2026.
+September 2026, plus other communication channels.
 
 ## 2.1 Use Case 1 — Population and Infrastructure Risk Exposure
 
@@ -60,8 +60,8 @@ integration path back into Charter client tools: a STAC `response-prioritisation
 Mapper overlay, and a conversational client. This specification work is complete and reviewed, and
 remains the longer-term direction, but is no longer the near-term target for this use case.
 
-The near-term plan has changed again, and substantially. Rather than building the composite score, the
-proposal from the ESA project manager is to engage a third-party partner already active in a Charter
+The near-term plan has changed substantially. Rather than building the composite score, the
+proposal from ESA is to engage a third-party partner already active in a Charter
 activation to assess Montandon directly. The engagement is explicitly best-effort and non-committal: the
 partner would use the Montandon database, irrespective of whether Charter-sourced content is itself in
 Montandon, alongside their own work on a live Charter activation, and produce a Utility Report assessing
@@ -73,7 +73,7 @@ risk for WP2, at the cost of no firm date for the report itself.
 current large-scale ("mega") activation in Nepal. This is not yet confirmed: the next step is agreeing a
 suitable Charter activation and partner. If an activation with Red Cross/Red Crescent involvement can be
 found, ideally Nepal itself, there is an additional opportunity to link Red Cross engagement to the
-activation results, potentially as part of a separate Montandon enhancement activity.
+activation results, potentially as part of a separate Montandon enhancement activity. This will be disucssed in the Readiness Review meeting in Geneva on September 14th.
 
 **What remains.** Confirming the activation and partner, and agreeing terms for the (non-committal)
 engagement. The composite-score implementation itself, combining the exposure output of Use Case 1, the
@@ -91,7 +91,7 @@ close to landing. Use Case 3, in its near-term, externally-led form (Section 2.3
 this: the proposed partner engagement is explicitly designed to use Montandon's database irrespective of
 whether Charter-sourced content is itself present.
 
-**Copernicus EMS.** The transformer that converts CEMS Rapid Mapping products into Monty STAC items is
+**Copernicus EMS.** The transformer that converts CEMS Rapid Mapping products into Montandon STAC items is
 implemented and merged in `pystac-monty`, and has received several rounds of fixes this past week
 (correcting related-item links and relaxing overly strict event matching). Deploying it as a running
 pipeline is progressing quickly: CEMS data is now flowing into the alpha environment, and staging is
@@ -110,9 +110,8 @@ eoAPI's queryables so it can be used as a search filter, is tracked as
 [monty-stac-extension#147](https://github.com/IFRCGo/monty-stac-extension/issues/147).
 
 **What this means for Use Case 2.** It can be developed and unit-tested against the worked examples
-already in `monty-stac-extension` (real CEMS and Charter fixtures used to build and validate the
-transformers), but cannot yet be run against a live, currently-correlated Montandon event on staging until
-CEMS's staging deployment lands (hoped for 11 September 2026) or Charter's (expected around 17 September
+already in `monty-stac-extension`, but cannot yet be run against a live, currently-correlated Montandon event on staging until
+CEMS's staging deployment lands (imminently) or Charter's (expected mid-to-late-September
 2026). This is the most direct near-term dependency for validating Use Case 2 end to end (Section 4.1).
 Use Case 3's near-term Utility Report activity (Section 2.3) has no such dependency.
 

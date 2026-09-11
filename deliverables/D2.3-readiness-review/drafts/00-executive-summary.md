@@ -1,7 +1,6 @@
 # Executive Summary
 
-This report is deliverable D2.3 of the ESA "Application Development concerning Disaster Data and
-Analytics" activity. It is the readiness review for Work Package 2, prepared ahead of the Readiness
+This report is deliverable D2.3 of the ESA Montandon contract. It is the readiness review for Work Package 2, prepared ahead of the Readiness
 Review meeting. It covers how close the three crisis-analytics use cases (population and infrastructure
 risk exposure, post-disaster impact estimation, and operational response prioritisation) are to being
 usable, what remains before each is ready, and the plan to complete that work.
@@ -15,32 +14,27 @@ whole assessment.
 
 ## Where things stand
 
-Progress is uneven across the three use cases, and each is further along than a first look at the
+Progress is uneven across the three use cases, which is expected. Each is further along than a first look at the
 underlying repositories alone would suggest.
 
 - **Use Case 1 (Risk Exposure)** is furthest along. MapAction has delivered baseline exposure-calculation
   notebooks covering three out four planned hazards (flood, cyclone, earthquake with wildfire under development), parameterised
-  so the same notebook runs for any country, and published as a working example. An earlier Streamlit
-  prototype explored a guided-form interface but is not expected to be the long-term interface.
+  so the same notebook runs for any country, and published as a working example.
 - **Use Case 2 (Impact Estimation)** has an initial notebook implementation, built by MapAction, opened
   for review this week. It has not yet been run against a live event end to end, and the Copernicus EMS
   and Charter data it depends on is not yet flowing into Montandon (see below).
-- **Use Case 3 (Response Prioritisation)** has been reframed for this cycle. Rather than building the
+- **Use Case 3 (Utility Report)** has been reframed for this cycle. Rather than building the
   composite prioritisation notebook specified in the D2.4 narrative, the plan is to engage a third-party
-  Charter-active partner, most likely UNOSAT given their role as Charter Project Manager for the current
-  large-scale activation in Nepal, to use the Montandon database while working that activation and
+  Charter-active partner (UNOSAT) given their role as Charter Project Manager for the current
+  large-scale activation in Nepal, to use the Montandon while working that activation and
   produce a Utility Report on the data's relevance, fitness for purpose, and recommendations for future
   improvement. This is a best-effort engagement with no delivery commitment, which substantially lowers
   WP2's own execution risk; the originally specified composite-score implementation remains a longer-term
-  direction rather than a near-term commitment. The specific activation and partner are not yet
-  finalised.
-
-None of the three yet lets a National Society user run a new analysis of their own without technical
-support; that self-service layer is the subject of WP3 (see D3.3).
+  direction rather than a near-term commitment.
 
 ## Confidence
 
-Confidence in reaching a usable state ahead of D2.4 is high for Use Case 1, medium-high for Use Case 2,
+Confidence in reaching a usable state ahead of D2.4 is high for Use Case 1 and for Use Case 2,
 and, in its reframed form, medium-high for Use Case 3: it no longer depends on WP2 engineering effort, on
 Use Cases 1 and 2 stabilising first, or on the CEMS/Charter ETL timeline, since it is an external
 partner's best-effort assessment of Montandon rather than a built composite score. The main uncertainty
@@ -53,12 +47,12 @@ and in a small number of open decisions, not in the design itself.
 
 Three issues could slow the use cases regardless of individual notebook progress. The Copernicus EMS and
 International Charter ETL pipelines, which supply the EO hazard data Use Cases 2 and 3 depend on, are
-close but not yet loading data into Montandon on staging: Copernicus EMS data is now flowing in the alpha
-environment, with staging expected around 11 September 2026, and Charter is expected on staging roughly a
+close but not yet loading data into Montandon: Copernicus EMS data is now loaded in the alpha
+and staging environments, and Charter is expected on staging roughly a
 week after that. The Montandon production database has index bloat and a
 query-performance risk that is only partly mitigated ([issue #34](https://github.com/developmentseed/esa-montandon/issues/34)).
 The strategy for how, and how often, baseline exposure data should be computed and published is still
-undecided. All three are tracked and owned; the ETL timeline is now close to resolved, the other two are not.
+undecided. All three are tracked and owned; the ETL timeline is now close to resolved, the other two are not. The performance issues aren't expected to block delivery of any deliverable in this contract.
 
 ## What this report covers
 
