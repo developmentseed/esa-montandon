@@ -15,6 +15,10 @@ DEFAULT_CRS = "EPSG:4326"
 WEB_MERCATOR_CRS = "EPSG:3857"
 # Unused by the notebooks (they read local files). Kept for optional STAC/WFS experiments.
 CEMS_STAC_URL = os.getenv("CEMS_STAC_URL", "https://stac.dataspace.copernicus.eu/v1")
+CEMS_RAPIDMAPPING_URL = os.getenv(
+    "CEMS_RAPIDMAPPING_URL",
+    "https://rapidmapping.emergency.copernicus.eu/backend/dashboard-api/public-activations/",
+)
 CEMS_WFS_URL = os.getenv("CEMS_WFS_URL", "https://example.invalid/cems/wfs")
 CEMS_API_TOKEN = os.getenv("CEMS_API_TOKEN")
 OVERPASS_URL = os.getenv("OVERPASS_URL", "https://overpass-api.de/api/interpreter")

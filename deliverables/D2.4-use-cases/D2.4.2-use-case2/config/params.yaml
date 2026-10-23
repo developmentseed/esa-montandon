@@ -1,4 +1,5 @@
-# Folder name under input/copernicus/{activation_id}/ (must contain data.gpkg or data.geojson)
+# Copernicus activation code. Notebook 02 reads data/cache/cems/{activation_id}/
+# after notebooks/01_cems_api_ingestion.ipynb has downloaded the vector layers.
 activation_id: "EMSR884"
 
 # Documentation only; does not change the loader. Options: flood | wildfire | storm | earthquake
@@ -13,21 +14,23 @@ target_age_group: "all"
 # ISO3 country code for GADM + WorldPop (e.g. VEN, NPL, UKR). Must match the event country.
 country_code: "VEN"
 
-# Bounding box [west, south, east, north] in WGS84. null = derived from the Copernicus file
+# Bounding box [west, south, east, north] in WGS84. null = derived from the cached layers
 bbox: null
 
 # Analysis CRS. Options: auto (local UTM from the data) | an EPSG string such as EPSG:32619
 analysis_crs: "auto"
 
 impact:
-  # Attribute used to keep "affected" features. If this column is missing (typical flood/burn polygons), all features are kept.
-  # Common names in CEMS files: damage | damage_confidence | damage_class | grading | class
-  damage_column: damage
-  # Value that means affected. Must match the column type:
-  #   damage (EMSR884): 1  (0 = not damaged)
-  #   damage_confidence: high_confidence  (other values: possible | probable)
-  #   grading / class: Destroyed  or  Damaged  (depends on the product)
-  damage_positive_value: 1
+  # Attribute used to keep affected features. If this column is missing (typical flood/burn extent), all features are kept.
+  # API grading layers use damage_gra. The local Overture file used damage.
+  damage_column: damage_gra
+  # One value, or a list of values. CEMS grades on EMSR884:
+  #   Destroyed | Damaged | Possibly damaged
+  # Left out: No visible damage | Not Analysed
+  damage_positive_value:
+    - Destroyed
+    - Damaged
+    - Possibly damaged
   # Extra degrees added around the Copernicus extent for OSM / WorldPop clip
   bbox_buffer_deg: 0.05
 

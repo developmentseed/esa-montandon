@@ -52,17 +52,23 @@ def concat_layers(layers: dict[str, gpd.GeoDataFrame]) -> gpd.GeoDataFrame:
 
 
 def filter_impact(impact: gpd.GeoDataFrame, params: dict) -> gpd.GeoDataFrame:
-    """Keep features where damage_column == damage_positive_value.
+    """Keep features whose damage column matches ``damage_positive_value``.
 
-    If that column is missing (typical flood/burn extent), keep all geometries.
+    ``damage_positive_value`` may be one value or a list (for example
+    Destroyed, Damaged, and Possibly damaged). If the column is missing,
+    typical of a flood or burn extent, every geometry is kept.
     """
     settings = params.get("impact") or {}
     column = settings.get("damage_column", "damage")
     positive = settings.get("damage_positive_value", 1)
     if column not in impact.columns:
         return impact.loc[impact.geometry.notna()].copy()
-    selected = impact.loc[impact.geometry.notna() & (impact[column] == positive)].copy()
-    return selected
+    values = impact[column]
+    if isinstance(positive, (list, tuple, set)):
+        matched = values.isin(list(positive))
+    else:
+        matched = values == positive
+    return impact.loc[impact.geometry.notna() & matched].copy()
 
 
 def bbox_from_geodataframe(frame: gpd.GeoDataFrame, buffer_deg: float = 0.05) -> list[float]:

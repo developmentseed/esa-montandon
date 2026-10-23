@@ -4,25 +4,20 @@ Jupyter (and optional script) workflow for **who and what fall inside an observe
 
 After a Copernicus EMS activation, a user can re-run the analysis with their own administrative units, OSM infrastructure, and WorldPop population — more flexible than the published CEMS spreadsheet summary.
 
-Copernicus is **not** queried over the network. You download the activation vectors yourself and drop them in `input/`.
+`notebooks/01_cems_api_ingestion.ipynb` reads the public Rapid Mapping API and caches vector layers under `data/cache/cems/{activation_id}/`. Notebooks 02 and 03 read that cache. They do not read `input/`. `01_cems_data_ingestion` still uses a local file when one is present.
 
 ---
 
 ## What a user does
 
-1. Download the CEMS geospatial product (GeoPackage preferred) from the [Copernicus EMS mapping portal](https://mapping.emergency.copernicus.eu/).
-2. Save it as:
+1. Run `notebooks/01_cems_api_ingestion.ipynb`. It downloads the activation into `data/cache/cems/{activation_id}/`.
+2. Edit `config/params.yaml` (`activation_id` must match that cache folder; set `country_code` to the ISO3 of the event country). Comments in that file list allowed values.
+3. Activate your conda environment and run notebooks 02 and 03, restarting the kernel when you switch activation. Notebook 03 uses each cached monitoring step. Dated GeoJSON files in `data/cems/temporal/` still override the cache when that folder is not empty.
+4. Share the files written under `data/` (see [Outputs](#outputs-to-share-with-the-team)).
 
-   ```text
-   input/copernicus/{activation_id}/data.gpkg
-   ```
+The older local notebook `01_cems_data_ingestion` still reads `input/copernicus/{activation_id}/data.gpkg` (or `data.geojson`) and is not used by notebook 02.
 
-   Example: `input/copernicus/EMSR884/data.gpkg`. `data.geojson` is accepted if there is no `.gpkg`.
-3. Edit `config/params.yaml` (`activation_id` must match the folder name; set `country_code` to the ISO3 of the event country). Comments in that file list allowed values.
-4. Activate your conda environment and run the notebooks **in order**, restarting the kernel when you switch activation.
-5. Share the files written under `data/` (see [Outputs](#outputs-to-share-with-the-team)).
-
-Notebook 02 needs internet for GADM, WorldPop, and OpenStreetMap (Overpass). Notebook 01 only reads the local file.
+Notebook 02 needs internet for GADM, WorldPop, and OpenStreetMap (Overpass). `01_cems_data_ingestion` only reads the local file. `01_cems_api_ingestion` needs internet for the Rapid Mapping API.
 
 ---
 
@@ -51,14 +46,15 @@ python scripts/run_impact_workflow.py
 | Notebook | Role | Network |
 |---|---|---|
 | `notebooks/01_cems_data_ingestion.ipynb` | Inspect local layers, counts, columns, damage filter | No |
-| `notebooks/02_impact_analysis_workflow.ipynb` | Overlay admin + OSM + WorldPop; map and tables | Yes |
-| `notebooks/03_temporal_evolution.ipynb` | Footprint area over time (one snapshot if only one product) | No (uses local file or `data/cems/temporal/`) |
+| `notebooks/01_cems_api_ingestion.ipynb` | Same kind of check, read from the Rapid Mapping API | Yes |
+| `notebooks/02_impact_analysis_workflow.ipynb` | Overlay admin + OSM + WorldPop using the API cache | Yes |
+| `notebooks/03_temporal_evolution.ipynb` | Footprint over time from cached monitoring steps | Yes (delivery times; vectors are local) |
 
 ---
 
 ## Outputs to share with the team
 
-Notebook 01 does not write files; it is a check.
+The local notebook 01 does not write files; it is a check. The API notebook caches GeoJSON under `data/cache/cems/`.
 
 **From notebook 02** (main package):
 
@@ -81,10 +77,9 @@ Those output names are reused. Copy the folder if you need to keep a previous ac
 
 ## Switching to another activation
 
-1. New folder: `input/copernicus/EMSR927/data.gpkg` (example).
-2. In `params.yaml`: `activation_id`, `country_code`, `hazard_type`. Leave `bbox: null`.
-3. After notebook 01, check attribute names. If there is no `damage` column (flood extent), leave the damage settings; all features are used. If the column is `damage_confidence` or `grading`, change `damage_column` / `damage_positive_value` to match.
-4. Restart the kernel and run 01 → 02 → 03.
+1. Set `activation_id` and `country_code` in `params.yaml`. Leave `bbox: null`.
+2. Run `01_cems_api_ingestion`, then notebook 02. The cache folder is `data/cache/cems/{activation_id}/`.
+3. After notebook 01, check attribute names. Grading layers use `damage_gra` (`Destroyed`, `Damaged`, `Possibly damaged`). If that column is missing, every geometry in the latest analysed layer is kept.
 
 ---
 
@@ -102,6 +97,7 @@ montandon_impact_estimation/
 ├── input/copernicus/{id}/    Your CEMS file (data.gpkg or data.geojson)
 ├── notebooks/
 │   ├── 01_cems_data_ingestion.ipynb
+│   ├── 01_cems_api_ingestion.ipynb
 │   ├── 02_impact_analysis_workflow.ipynb
 │   └── 03_temporal_evolution.ipynb
 ├── src/                      Shared Python used by the notebooks
@@ -109,6 +105,7 @@ montandon_impact_estimation/
 │   ├── baseline_fetcher.py
 │   ├── spatial_analysis.py
 │   ├── visualization.py
+│   ├── cems_api.py           Rapid Mapping client (notebooks 01 API and 02)
 │   └── cems_fetcher.py       Unused by notebooks (optional STAC/WFS)
 ├── scripts/
 │   └── run_impact_workflow.py
@@ -130,6 +127,7 @@ montandon_impact_estimation/
 | `baseline_fetcher.py` | GADM boundaries, Overpass OSM, WorldPop 1 km raster (cached). |
 | `spatial_analysis.py` | UTM CRS, count/area by admin, infrastructure inside impact, population under the damage mask. |
 | `visualization.py` | Folium map, temporal plot, GeoJSON export. |
+| `cems_api.py` | Rapid Mapping client. Notebook 01 downloads vectors; notebook 02 reads that cache. |
 | `cems_fetcher.py` | Experimental remote CEMS client. Notebooks do not import it. |
 
 ### `notebooks/`
@@ -145,7 +143,7 @@ Thin orchestration: they read `params.yaml`, call `src/`, and display results. L
 
 ## How the analysis works (short)
 
-1. Read CEMS polygons from disk. If a damage column exists, keep the positive class only.
+1. Read the latest cached CEMS layers for the activation. Where `damage_gra` exists, keep Destroyed, Damaged, and Possibly damaged.
 2. Derive a bounding box from those polygons (`bbox: null`).
 3. Load GADM units for `country_code` / `target_admin_level` and keep those that intersect the box.
 4. Query OSM for the selected infrastructure types; keep features that intersect impact.
@@ -159,4 +157,4 @@ Thin orchestration: they read `params.yaml`, call `src/`, and display results. L
 - `baseline.admin_source: hdx` is not implemented; use `gadm`.
 - `target_age_group` is reserved and unused.
 - Overpass may rate-limit roads; hospitals/schools can still succeed.
-- A single CEMS grading product yields one point on the temporal chart. Multiple dated GeoJSON files in `data/cems/temporal/` (or several dated layers in the GeoPackage) are needed for a real time series.
+- Point and line grading layers have little or no polygon area, so the temporal chart can stay near zero while `feature_count` still changes. A folder of dated GeoJSON files in `data/cems/temporal/` overrides the cache.

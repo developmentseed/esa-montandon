@@ -10,14 +10,8 @@ sys.path.insert(0, str(ROOT))
 from shapely.geometry import box
 
 from src.baseline_fetcher import fetch_admin_boundaries, fetch_osm_infrastructure, fetch_worldpop_population
-from src.copernicus_loader import (
-    bbox_from_geodataframe,
-    concat_layers,
-    copernicus_file,
-    filter_impact,
-    load_copernicus_layers,
-    load_params,
-)
+from src.cems_api import load_cached_vectors
+from src.copernicus_loader import bbox_from_geodataframe, concat_layers, filter_impact, load_params
 from src.spatial_analysis import (
     admin_id_column,
     admin_name_column,
@@ -30,11 +24,10 @@ from src.visualization import export_geodataframe, impact_map
 
 
 def main() -> None:
-    # 1. Local Copernicus vectors, filtered by the damage settings in params.yaml
+    # 1. Cached Rapid Mapping vectors from notebook 01, filtered by params.yaml
     params = load_params(ROOT)
-    cop_file = copernicus_file(ROOT, params["activation_id"])
-    print("loading", cop_file, flush=True)
-    impact = filter_impact(concat_layers(load_copernicus_layers(cop_file)), params)
+    print("loading cache", params["activation_id"], flush=True)
+    impact = filter_impact(concat_layers(load_cached_vectors(params["activation_id"])), params)
     bbox = params.get("bbox") or bbox_from_geodataframe(
         impact, float((params.get("impact") or {}).get("bbox_buffer_deg", 0.05))
     )
