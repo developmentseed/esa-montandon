@@ -1,0 +1,14 @@
+geopandas>=0.14
+rasterio>=1.3
+rioxarray>=0.15
+rasterstats>=0.19
+exactextract>=0.2
+folium>=0.15
+leafmap>=0.30
+requests>=2.31
+PyYAML>=6.0
+pandas>=2.0
+matplotlib>=3.8
+numpy>=1.24
+shapely>=2.0
+pyogrio>=0.7
