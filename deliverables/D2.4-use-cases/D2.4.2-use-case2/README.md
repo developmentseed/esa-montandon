@@ -4,20 +4,20 @@ Jupyter (and optional script) workflow for **who and what fall inside an observe
 
 After a Copernicus EMS activation, a user can re-run the analysis with their own administrative units, OSM infrastructure, and WorldPop population — more flexible than the published CEMS spreadsheet summary.
 
-`notebooks/01_cems_api_ingestion.ipynb` reads the public Rapid Mapping API and caches vector layers under `data/cache/cems/{activation_id}/`. Notebooks 02 and 03 read that cache. They do not read `input/`. `01_cems_data_ingestion` still uses a local file when one is present.
+`notebooks/01_cems_api_ingestion.ipynb` reads the Montandon STAC catalog and caches vector layers under `data/cache/cems/{activation_id}/`. Set `MONTANDON_STAC_TOKEN` before running it. Notebooks 02 and 03 read that cache. They do not read `input/`. `01_cems_data_ingestion` still uses a local file when one is present.
 
 ---
 
 ## What a user does
 
-1. Run `notebooks/01_cems_api_ingestion.ipynb`. It downloads the activation into `data/cache/cems/{activation_id}/`.
+1. Set `MONTANDON_STAC_TOKEN`, then run `notebooks/01_cems_api_ingestion.ipynb`. It reads the Montandon STAC catalog and downloads response GeoJSON into `data/cache/cems/{activation_id}/`.
 2. Edit `config/params.yaml` (`activation_id` must match that cache folder; set `country_code` to the ISO3 of the event country). Comments in that file list allowed values.
 3. Activate your conda environment and run notebooks 02 and 03, restarting the kernel when you switch activation. Notebook 03 uses each cached monitoring step. Dated GeoJSON files in `data/cems/temporal/` still override the cache when that folder is not empty.
 4. Share the files written under `data/` (see [Outputs](#outputs-to-share-with-the-team)).
 
 The older local notebook `01_cems_data_ingestion` still reads `input/copernicus/{activation_id}/data.gpkg` (or `data.geojson`) and is not used by notebook 02.
 
-Notebook 02 needs internet for GADM, WorldPop, and OpenStreetMap (Overpass). `01_cems_data_ingestion` only reads the local file. `01_cems_api_ingestion` needs internet for the Rapid Mapping API.
+Notebook 02 needs internet for GADM, WorldPop, and OpenStreetMap (Overpass). `01_cems_data_ingestion` only reads the local file. `01_cems_api_ingestion` needs internet and `MONTANDON_STAC_TOKEN` for the Montandon STAC catalog.
 
 ---
 
@@ -46,7 +46,7 @@ python scripts/run_impact_workflow.py
 | Notebook | Role | Network |
 |---|---|---|
 | `notebooks/01_cems_data_ingestion.ipynb` | Inspect local layers, counts, columns, damage filter | No |
-| `notebooks/01_cems_api_ingestion.ipynb` | Same kind of check, read from the Rapid Mapping API | Yes |
+| `notebooks/01_cems_api_ingestion.ipynb` | Read the Montandon STAC catalog and cache response GeoJSON | Yes |
 | `notebooks/02_impact_analysis_workflow.ipynb` | Overlay admin + OSM + WorldPop using the API cache | Yes |
 | `notebooks/03_temporal_evolution.ipynb` | Footprint over time from cached monitoring steps | Yes (delivery times; vectors are local) |
 
@@ -105,7 +105,7 @@ montandon_impact_estimation/
 │   ├── baseline_fetcher.py
 │   ├── spatial_analysis.py
 │   ├── visualization.py
-│   ├── cems_api.py           Rapid Mapping client (notebooks 01 API and 02)
+│   ├── cems_api.py           Montandon STAC client (notebooks 01, 02, and 03)
 │   └── cems_fetcher.py       Unused by notebooks (optional STAC/WFS)
 ├── scripts/
 │   └── run_impact_workflow.py
@@ -127,7 +127,7 @@ montandon_impact_estimation/
 | `baseline_fetcher.py` | GADM boundaries, Overpass OSM, WorldPop 1 km raster (cached). |
 | `spatial_analysis.py` | UTM CRS, count/area by admin, infrastructure inside impact, population under the damage mask. |
 | `visualization.py` | Folium map, temporal plot, GeoJSON export. |
-| `cems_api.py` | Rapid Mapping client. Notebook 01 downloads vectors; notebook 02 reads that cache. |
+| `cems_api.py` | Montandon STAC client. Notebook 01 downloads vectors; notebooks 02 and 03 read that cache. |
 | `cems_fetcher.py` | Experimental remote CEMS client. Notebooks do not import it. |
 
 ### `notebooks/`

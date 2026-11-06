@@ -24,7 +24,7 @@ from src.visualization import export_geodataframe, impact_map
 
 
 def main() -> None:
-    # 1. Cached Rapid Mapping vectors from notebook 01, filtered by params.yaml
+    # 1. Cached Montandon STAC vectors from notebook 01, filtered by params.yaml
     params = load_params(ROOT)
     print("loading cache", params["activation_id"], flush=True)
     impact = filter_impact(concat_layers(load_cached_vectors(params["activation_id"])), params)

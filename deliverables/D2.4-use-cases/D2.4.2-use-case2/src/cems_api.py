@@ -1,12 +1,13 @@
-"""Read one Copernicus EMS Rapid Mapping activation from the public dashboard API.
+"""Read one CEMS activation from the Montandon STAC catalog.
 
-The detail endpoint returns the activation, its areas of interest, and every
-product. Published vector layers (format ``vt``) are GeoJSON files. This module
-caches those files under ``data/cache/cems/{code}/`` and does not touch
-``input/copernicus/``.
+The catalog is https://montandon-eoapi.ifrc.org/stac. Item and search calls
+need ``MONTANDON_STAC_TOKEN``. Vector GeoJSON assets from ``cems-response``
+are cached under ``data/cache/cems/{code}/`` together with ``manifest.json``.
+Notebooks 02 and 03 read that cache and do not call Copernicus.
 """
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 from typing import Any
@@ -15,158 +16,158 @@ import geopandas as gpd
 import pandas as pd
 import requests
 
-from config.config import CACHE_DIR, CEMS_RAPIDMAPPING_URL, HTTP_TIMEOUT_SECONDS
+from config.config import CACHE_DIR, HTTP_TIMEOUT_SECONDS, MONTANDON_STAC_TOKEN, MONTANDON_STAC_URL
 
 _USER_AGENT = {"User-Agent": "montandon-impact-estimation/0.1 (IFRC Montandon use case 2)"}
 _VECTOR_TIMEOUT = (30, 180)
-_STAT_COLUMNS = [
-    "scope",
-    "aoi_number",
-    "aoi_name",
-    "product_type",
-    "monitoring_number",
-    "thematic",
-    "subclass",
+_MANIFEST_NAME = "manifest.json"
+_RELATED_COLLECTIONS = ("cems-hazards", "cems-response", "cems-impacts")
+_IMPACT_COLUMNS = [
+    "item_id",
+    "datetime",
+    "category",
+    "type",
+    "value",
     "unit",
-    "total",
-    "affected",
+    "estimate_type",
 ]
+_AOI_RE = re.compile(r"AOI(\d+)", re.IGNORECASE)
+_MONIT_RE = re.compile(r"MONIT(\d+)", re.IGNORECASE)
+_THEME_RE = re.compile(r"(?:PRODUCT|MONIT\d+)_(.+)_v\d+$", re.IGNORECASE)
 
 
-def fetch_activation(code: str) -> dict[str, Any]:
-    """Return the activation detail payload for an EMSR code.
-
-    The endpoint is public and unauthenticated. It answers
-    ``{count, next, previous, results: [activation]}``.
-    """
-    if not code or not str(code).strip():
-        raise ValueError("activation code is required")
-    code = str(code).strip()
-    response = requests.get(
-        CEMS_RAPIDMAPPING_URL,
-        params={"code": code},
-        timeout=HTTP_TIMEOUT_SECONDS,
-        headers=_USER_AGENT,
-    )
-    response.raise_for_status()
-    payload = response.json()
-    results = payload.get("results") or []
-    matches = [item for item in results if item.get("code") == code]
-    if not matches:
-        raise LookupError(f"No Rapid Mapping activation found for {code}")
-    return matches[0]
+def fetch_event(code: str) -> dict[str, Any]:
+    """Return the ``cems-events`` item ``cems-event-{code}``."""
+    code = _require_code(code)
+    url = f"{MONTANDON_STAC_URL}/collections/cems-events/items/cems-event-{code}"
+    response = requests.get(url, headers=_stac_headers(), timeout=HTTP_TIMEOUT_SECONDS)
+    if response.status_code == 404:
+        raise LookupError(f"No Montandon CEMS event found for {code}")
+    _raise_for_status(response)
+    return response.json()
 
 
-def activation_summary(activation: dict[str, Any]) -> dict[str, Any]:
-    """Fields used to identify the event before looking at products."""
-    countries = []
-    for country in activation.get("countries") or []:
-        if isinstance(country, dict):
-            name = country.get("name")
-            if name:
-                countries.append(str(name))
-        elif country:
-            countries.append(str(country))
-    aois = activation.get("aois") or []
-    n_products = sum(len(aoi.get("products") or []) for aoi in aois)
+def fetch_stac_activation(code: str) -> dict[str, Any]:
+    """Event item plus hazards, responses, and impacts that share its ``monty:corr_id``."""
+    event = fetch_event(code)
+    properties = event.get("properties") or {}
+    corr_id = properties.get("monty:corr_id")
+    if not corr_id:
+        raise LookupError(f"{event.get('id')} has no monty:corr_id")
     return {
-        "code": activation.get("code"),
-        "name": activation.get("name"),
-        "category": activation.get("category"),
-        "sub_category": activation.get("subCategory"),
-        "countries": ", ".join(countries),
-        "event_time": activation.get("eventTime"),
-        "closed": activation.get("closed"),
-        "gdacs_id": activation.get("gdacsId"),
-        "charter_number": activation.get("charterNumber"),
-        "n_aois": len(aois),
-        "n_products": n_products,
+        "code": _require_code(code),
+        "corr_id": corr_id,
+        "event": event,
+        "hazards": search_by_corr_id("cems-hazards", corr_id),
+        "responses": search_by_corr_id("cems-response", corr_id),
+        "impacts": search_by_corr_id("cems-impacts", corr_id),
     }
 
 
-def product_catalog(activation: dict[str, Any]) -> pd.DataFrame:
-    """One row per AOI product: status, monitoring step, vector count, ZIP link."""
+def search_by_corr_id(collection: str, corr_id: str) -> list[dict[str, Any]]:
+    """Page a STAC search filtered on the documented ``monty:corr_id`` queryable."""
+    if collection not in _RELATED_COLLECTIONS:
+        raise ValueError(f"Unsupported collection {collection}")
+    body = {
+        "collections": [collection],
+        "filter": {"op": "=", "args": [{"property": "monty:corr_id"}, corr_id]},
+        "filter-lang": "cql2-json",
+        "limit": 100,
+    }
+    return _search(body)
+
+
+def event_summary(event: dict[str, Any]) -> dict[str, Any]:
+    """Fields used to identify the Montandon event before looking at related items."""
+    properties = event.get("properties") or {}
+    return {
+        "id": event.get("id"),
+        "title": properties.get("title"),
+        "datetime": properties.get("datetime"),
+        "country_codes": ", ".join(properties.get("monty:country_codes") or []),
+        "hazard_codes": ", ".join(properties.get("monty:hazard_codes") or []),
+        "corr_id": properties.get("monty:corr_id"),
+    }
+
+
+def hazard_table(items: list[dict[str, Any]]) -> pd.DataFrame:
+    """One row per ``cems-hazards`` item."""
     rows = []
-    for aoi in activation.get("aois") or []:
-        products = aoi.get("products") or []
-        if not products:
+    for item in items:
+        properties = item.get("properties") or {}
+        geometry = item.get("geometry") or {}
+        rows.append(
+            {
+                "id": item.get("id"),
+                "title": properties.get("title"),
+                "datetime": properties.get("datetime"),
+                "hazard_codes": ", ".join(properties.get("monty:hazard_codes") or []),
+                "geometry_type": geometry.get("type"),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def response_table(items: list[dict[str, Any]]) -> pd.DataFrame:
+    """One row per ``cems-response`` item."""
+    rows = []
+    for item in items:
+        properties = item.get("properties") or {}
+        detail = properties.get("monty:response_detail") or {}
+        rows.append(
+            {
+                "id": item.get("id"),
+                "title": properties.get("title"),
+                "datetime": properties.get("datetime"),
+                "response_type": detail.get("type"),
+                "status": detail.get("status"),
+                "monitoring_number": detail.get("monitoring_number"),
+                "source_id": detail.get("source_id"),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def asset_index(responses: list[dict[str, Any]]) -> pd.DataFrame:
+    """Every response asset. Only ``application/geo+json`` rows are downloaded."""
+    rows = []
+    for item in responses:
+        for name, asset in (item.get("assets") or {}).items():
             rows.append(
                 {
-                    "aoi_number": aoi.get("number"),
-                    "aoi_name": aoi.get("name"),
-                    "type": None,
-                    "monitoring_number": None,
-                    "status_code": None,
-                    "delivery_time": None,
-                    "n_vector_layers": 0,
-                    "n_cog_layers": 0,
-                    "download_path": None,
-                }
-            )
-        for product in products:
-            version = product.get("version") or {}
-            layers = product.get("layers") or []
-            rows.append(
-                {
-                    "aoi_number": product.get("aoiNumber", aoi.get("number")),
-                    "aoi_name": product.get("aoiName", aoi.get("name")),
-                    "type": product.get("type"),
-                    "monitoring_number": product.get("monitoringNumber"),
-                    "status_code": version.get("statusCode"),
-                    "delivery_time": version.get("deliveryTime"),
-                    "n_vector_layers": sum(1 for layer in layers if layer.get("format") == "vt"),
-                    "n_cog_layers": sum(1 for layer in layers if layer.get("format") == "cog"),
-                    "download_path": product.get("downloadPath"),
+                    "item_id": item.get("id"),
+                    "asset": name,
+                    "media_type": asset.get("type"),
+                    "roles": ", ".join(asset.get("roles") or []),
+                    "href": asset.get("href"),
+                    "download": _is_vector_asset(asset),
                 }
             )
     return pd.DataFrame(rows)
 
 
-def layer_index(activation: dict[str, Any]) -> pd.DataFrame:
-    """Every product layer. Vector rows carry a GeoJSON url; COG rows usually do not."""
+def impact_stats_table(impacts: list[dict[str, Any]]) -> pd.DataFrame:
+    """``monty:impact_detail`` from each ``cems-impacts`` item.
+
+    These are the figures Montandon already publishes. They are not the
+    admin-level overlay computed in notebook 02.
+    """
     rows = []
-    for aoi in activation.get("aois") or []:
-        for product in aoi.get("products") or []:
-            version = product.get("version") or {}
-            for layer in product.get("layers") or []:
-                rows.append(
-                    {
-                        "aoi_number": product.get("aoiNumber", aoi.get("number")),
-                        "aoi_name": product.get("aoiName", aoi.get("name")),
-                        "product_type": product.get("type"),
-                        "monitoring_number": product.get("monitoringNumber"),
-                        "status_code": version.get("statusCode"),
-                        "format": layer.get("format"),
-                        "layer": layer.get("name"),
-                        "url": layer.get("json"),
-                    }
-                )
-    return pd.DataFrame(rows)
-
-
-def published_vector_layers(activation: dict[str, Any]) -> list[dict[str, Any]]:
-    """GeoJSON links for products whose ``statusCode`` is ``F`` (published)."""
-    records = []
-    for aoi in activation.get("aois") or []:
-        for product in aoi.get("products") or []:
-            version = product.get("version") or {}
-            if version.get("statusCode") != "F":
-                continue
-            for layer in product.get("layers") or []:
-                if layer.get("format") != "vt" or not layer.get("json"):
-                    continue
-                records.append(
-                    {
-                        "layer": layer.get("name"),
-                        "url": layer["json"],
-                        "aoi_number": product.get("aoiNumber", aoi.get("number")),
-                        "aoi_name": product.get("aoiName", aoi.get("name")),
-                        "product_type": product.get("type"),
-                        "monitoring_number": product.get("monitoringNumber"),
-                        "delivery_time": version.get("deliveryTime"),
-                    }
-                )
-    return records
+    for item in impacts:
+        properties = item.get("properties") or {}
+        detail = properties.get("monty:impact_detail") or {}
+        rows.append(
+            {
+                "item_id": item.get("id"),
+                "datetime": properties.get("datetime"),
+                "category": detail.get("category"),
+                "type": detail.get("type"),
+                "value": detail.get("value"),
+                "unit": detail.get("unit"),
+                "estimate_type": detail.get("estimate_type"),
+            }
+        )
+    return pd.DataFrame(rows, columns=_IMPACT_COLUMNS)
 
 
 def vector_cache_dir(code: str) -> Path:
@@ -176,27 +177,61 @@ def vector_cache_dir(code: str) -> Path:
     return path
 
 
-_AOI_RE = re.compile(r"AOI(\d+)", re.IGNORECASE)
-_MONIT_RE = re.compile(r"MONIT(\d+)", re.IGNORECASE)
-_THEME_RE = re.compile(r"(?:PRODUCT|MONIT\d+)_(.+)_v\d+$", re.IGNORECASE)
+def load_response_vectors(
+    responses: list[dict[str, Any]],
+    code: str,
+) -> tuple[dict[str, gpd.GeoDataFrame], list[str]]:
+    """Download response GeoJSON assets into the cache and load each file.
+
+    A layer that fails is reported and skipped. Files already in the cache are
+    reused. ``manifest.json`` records the STAC datetime used by notebook 03.
+    """
+    code = _require_code(code)
+    cache_dir = vector_cache_dir(code)
+    loaded: dict[str, gpd.GeoDataFrame] = {}
+    errors: list[str] = []
+    manifest_layers: list[dict[str, Any]] = []
+    for record in _vector_assets(responses):
+        path = _cache_path(cache_dir, record["href"], record["asset"])
+        label = f"{record['item_id']}:{record['asset']}"
+        try:
+            if not path.exists() or path.stat().st_size == 0:
+                _download_file(record["href"], path)
+            frame = gpd.read_file(path)
+            if frame.crs is None:
+                frame = frame.set_crs("EPSG:4326")
+            frame["cems_layer"] = path.stem
+            frame["stac_item"] = record["item_id"]
+            frame["monitoring_number"] = record["monitoring_number"]
+            frame["delivery_time"] = record["datetime"]
+            loaded[path.stem] = frame
+            manifest_layers.append(
+                {
+                    "file": path.name,
+                    "item_id": record["item_id"],
+                    "asset": record["asset"],
+                    "href": record["href"],
+                    "datetime": record["datetime"],
+                    "monitoring_number": record["monitoring_number"],
+                }
+            )
+        except Exception as exc:
+            errors.append(f"{label}: {exc}")
+    _write_manifest(cache_dir, code, manifest_layers)
+    return loaded, errors
 
 
 def load_cached_vectors(code: str) -> dict[str, gpd.GeoDataFrame]:
     """Load the latest cached GeoJSON for each area of interest and theme.
 
-    Notebook 01 stores every published vector layer, including monitoring
-    repeats and ``notAnalysed`` extents. Notebook 02 should see one current
-    layer per area and theme, so this keeps the highest monitoring number and
-    drops layers whose name is ``notAnalysed``.
+    Notebook 01 stores every response vector, including monitoring repeats and
+    ``notAnalysed`` extents. Notebook 02 should see one current layer per area
+    and theme, so this keeps the highest monitoring number and drops layers
+    whose name is ``notAnalysed``.
     """
-    folder = CACHE_DIR / "cems" / str(code).strip()
-    files = [
-        path
-        for pattern in ("*.json", "*.geojson")
-        for path in sorted(folder.glob(pattern))
-        if path.is_file() and not path.name.endswith(".part")
-    ]
+    files = _cached_geojsons(code)
     if not files:
+        folder = CACHE_DIR / "cems" / str(code).strip()
         raise FileNotFoundError(
             f"No cached CEMS vectors in {folder}. Run notebooks/01_cems_api_ingestion.ipynb first."
         )
@@ -222,23 +257,19 @@ def load_cached_vectors(code: str) -> dict[str, gpd.GeoDataFrame]:
 
 
 def cached_timeline(code: str) -> list[dict[str, Any]]:
-    """Analysed cache files in monitoring order, with a delivery time when the API responds.
+    """Analysed cache files in monitoring order.
 
-    ``notAnalysed`` layers are omitted. Every monitoring step is kept, unlike
-    ``load_cached_vectors``, which keeps only the latest step for notebook 02.
+    Delivery times come from ``manifest.json`` written by notebook 01. This
+    function does not call the catalog again. ``notAnalysed`` layers are omitted,
+    and every monitoring step is kept.
     """
-    folder = CACHE_DIR / "cems" / str(code).strip()
-    files = [
-        path
-        for pattern in ("*.json", "*.geojson")
-        for path in sorted(folder.glob(pattern))
-        if path.is_file() and not path.name.endswith(".part")
-    ]
+    files = _cached_geojsons(code)
     if not files:
+        folder = CACHE_DIR / "cems" / str(code).strip()
         raise FileNotFoundError(
             f"No cached CEMS vectors in {folder}. Run notebooks/01_cems_api_ingestion.ipynb first."
         )
-    delivered = _delivery_times(code)
+    delivered = _manifest_times(code)
     rows = []
     for path in files:
         aoi, monitoring, family = _layer_identity(path)
@@ -260,18 +291,109 @@ def cached_timeline(code: str) -> list[dict[str, Any]]:
     return rows
 
 
-def _delivery_times(code: str) -> dict[str, str]:
-    """Map a cached GeoJSON filename to the product ``deliveryTime``. The API is optional."""
-    try:
-        activation = fetch_activation(code)
-    except Exception:
+def _require_code(code: str) -> str:
+    if not code or not str(code).strip():
+        raise ValueError("activation code is required")
+    return str(code).strip()
+
+
+def _stac_headers() -> dict[str, str]:
+    if not MONTANDON_STAC_TOKEN:
+        raise RuntimeError(
+            "MONTANDON_STAC_TOKEN is not set. The Montandon STAC catalog requires a bearer token "
+            "from the IFRC identity provider (https://goadmin.ifrc.org)."
+        )
+    return {**_USER_AGENT, "Authorization": f"Bearer {MONTANDON_STAC_TOKEN}"}
+
+
+def _raise_for_status(response: requests.Response) -> None:
+    if response.status_code == 401:
+        raise RuntimeError("Montandon STAC rejected the bearer token (401).")
+    response.raise_for_status()
+
+
+def _search(body: dict[str, Any]) -> list[dict[str, Any]]:
+    headers = _stac_headers()
+    url: str | None = f"{MONTANDON_STAC_URL}/search"
+    payload: dict[str, Any] | None = body
+    features: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for _page in range(50):
+        if url is None or url in seen:
+            break
+        seen.add(url)
+        if payload is None:
+            response = requests.get(url, headers=headers, timeout=HTTP_TIMEOUT_SECONDS)
+        else:
+            response = requests.post(url, json=payload, headers=headers, timeout=HTTP_TIMEOUT_SECONDS)
+        _raise_for_status(response)
+        page = response.json()
+        features.extend(page.get("features") or [])
+        payload = None
+        url = next(
+            (
+                link.get("href")
+                for link in page.get("links") or []
+                if link.get("rel") == "next" and link.get("href")
+            ),
+            None,
+        )
+    return features
+
+
+def _is_vector_asset(asset: dict[str, Any]) -> bool:
+    href = asset.get("href") or ""
+    media = (asset.get("type") or "").lower()
+    return href.startswith("http") and "geo+json" in media
+
+
+def _vector_assets(responses: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    records = []
+    for item in responses:
+        properties = item.get("properties") or {}
+        detail = properties.get("monty:response_detail") or {}
+        for name, asset in (item.get("assets") or {}).items():
+            if not _is_vector_asset(asset):
+                continue
+            records.append(
+                {
+                    "item_id": item.get("id"),
+                    "asset": name,
+                    "href": asset["href"],
+                    "datetime": properties.get("datetime"),
+                    "monitoring_number": detail.get("monitoring_number"),
+                }
+            )
+    return records
+
+
+def _write_manifest(cache_dir: Path, code: str, layers: list[dict[str, Any]]) -> None:
+    document = {"code": code, "layers": layers}
+    (cache_dir / _MANIFEST_NAME).write_text(json.dumps(document, indent=2), encoding="utf-8")
+
+
+def _manifest_times(code: str) -> dict[str, str]:
+    path = CACHE_DIR / "cems" / str(code).strip() / _MANIFEST_NAME
+    if not path.exists():
         return {}
-    delivered = {}
-    for record in published_vector_layers(activation):
-        leaf = str(record["url"]).rstrip("/").split("/")[-1].split("?")[0]
-        if record.get("delivery_time"):
-            delivered[leaf] = record["delivery_time"]
-    return delivered
+    document = json.loads(path.read_text(encoding="utf-8"))
+    times = {}
+    for layer in document.get("layers") or []:
+        filename = layer.get("file")
+        when = layer.get("datetime")
+        if filename and when:
+            times[str(filename)] = str(when)
+    return times
+
+
+def _cached_geojsons(code: str) -> list[Path]:
+    folder = CACHE_DIR / "cems" / str(code).strip()
+    files = []
+    for pattern in ("*.json", "*.geojson"):
+        for path in sorted(folder.glob(pattern)):
+            if path.is_file() and path.name != _MANIFEST_NAME and not path.name.endswith(".part"):
+                files.append(path)
+    return files
 
 
 def _layer_identity(path: Path) -> tuple[str, int, str]:
@@ -281,120 +403,10 @@ def _layer_identity(path: Path) -> tuple[str, int, str]:
     monitoring_match = _MONIT_RE.search(stem)
     theme_match = _THEME_RE.search(stem)
     token = theme_match.group(1) if theme_match else stem
-    # CEMS suffixes A/P/L are area, point, and line versions of one theme.
     family = token[:-1] if len(token) > 1 and token[-1] in {"A", "P", "L"} else token
     aoi = aoi_match.group(1) if aoi_match else stem
     monitoring = int(monitoring_match.group(1)) if monitoring_match else 0
     return aoi, monitoring, family
-
-
-def load_published_vectors(
-    activation: dict[str, Any],
-) -> tuple[dict[str, gpd.GeoDataFrame], list[str]]:
-    """Download published vector GeoJSON into the cache and load each file.
-
-    A layer that fails to download or parse is reported and skipped. Files
-    already in the cache are reused.
-    """
-    code = activation.get("code")
-    if not code:
-        raise ValueError("activation has no code")
-    cache_dir = vector_cache_dir(str(code))
-    loaded: dict[str, gpd.GeoDataFrame] = {}
-    errors: list[str] = []
-    for record in published_vector_layers(activation):
-        layer_name = str(record["layer"])
-        path = _cache_path(cache_dir, record["url"], layer_name)
-        try:
-            if not path.exists() or path.stat().st_size == 0:
-                _download_file(record["url"], path)
-            frame = gpd.read_file(path)
-            if frame.crs is None:
-                frame = frame.set_crs("EPSG:4326")
-            frame["cems_layer"] = layer_name
-            frame["aoi_number"] = record["aoi_number"]
-            frame["aoi_name"] = record["aoi_name"]
-            frame["product_type"] = record["product_type"]
-            frame["monitoring_number"] = record["monitoring_number"]
-            frame["delivery_time"] = record["delivery_time"]
-            loaded[layer_name] = frame
-        except Exception as exc:
-            errors.append(f"{layer_name}: {exc}")
-    return loaded, errors
-
-
-def impact_stats_table(activation: dict[str, Any]) -> pd.DataFrame:
-    """Activation totals plus statistics on each published GRA or GRM product.
-
-    These are the figures Copernicus already publishes. They are not the
-    admin-level overlay computed in notebook 02.
-    """
-    rows = _stat_rows(activation.get("stats"), scope="activation")
-    for aoi in activation.get("aois") or []:
-        for product in aoi.get("products") or []:
-            product_type = product.get("type")
-            if product_type not in {"GRA", "GRM"}:
-                continue
-            version = product.get("version") or {}
-            if version.get("statusCode") != "F":
-                continue
-            rows.extend(
-                _stat_rows(
-                    product.get("stats"),
-                    scope="product",
-                    aoi_number=product.get("aoiNumber", aoi.get("number")),
-                    aoi_name=product.get("aoiName", aoi.get("name")),
-                    product_type=product_type,
-                    monitoring_number=product.get("monitoringNumber"),
-                )
-            )
-    return pd.DataFrame(rows, columns=_STAT_COLUMNS)
-
-
-def _stat_rows(stats: Any, **context: Any) -> list[dict[str, Any]]:
-    """Flatten ``{thematic: {subclass: {total, affected, unit}}}`` or a scalar map."""
-    base = {column: context.get(column) for column in _STAT_COLUMNS}
-    if not isinstance(stats, dict):
-        return []
-    rows = []
-    for thematic, payload in stats.items():
-        if isinstance(payload, dict) and payload and all(isinstance(value, dict) for value in payload.values()):
-            for subclass, figures in payload.items():
-                unit = figures.get("unit") or figures.get("totalUnit") or None
-                rows.append(
-                    {
-                        **base,
-                        "thematic": thematic,
-                        "subclass": subclass,
-                        "unit": unit or None,
-                        "total": figures.get("total"),
-                        "affected": figures.get("affected"),
-                    }
-                )
-            continue
-        if isinstance(payload, dict):
-            rows.append(
-                {
-                    **base,
-                    "thematic": thematic,
-                    "subclass": None,
-                    "unit": payload.get("unit") or payload.get("totalUnit"),
-                    "total": payload.get("total", payload.get("value")),
-                    "affected": payload.get("affected"),
-                }
-            )
-            continue
-        rows.append(
-            {
-                **base,
-                "thematic": thematic,
-                "subclass": None,
-                "unit": None,
-                "total": payload,
-                "affected": None,
-            }
-        )
-    return rows
 
 
 def _cache_path(cache_dir: Path, url: str, layer_name: str) -> Path:
@@ -406,7 +418,10 @@ def _cache_path(cache_dir: Path, url: str, layer_name: str) -> Path:
 
 
 def _download_file(url: str, destination: Path) -> None:
-    """Stream a GeoJSON to a ``.part`` file, then rename it into place."""
+    """Stream a GeoJSON to a ``.part`` file, then rename it into place.
+
+    Asset hosts are public object storage. The STAC bearer token is not sent.
+    """
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_suffix(destination.suffix + ".part")
     with requests.get(url, stream=True, timeout=_VECTOR_TIMEOUT, headers=_USER_AGENT) as response:
