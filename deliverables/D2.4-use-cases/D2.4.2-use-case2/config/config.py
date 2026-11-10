@@ -8,7 +8,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = Path(os.getenv("MONTANDON_DATA_DIR", PROJECT_ROOT / "data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
-CACHE_DIR = DATA_DIR / "cache"  # GADM JSON, WorldPop tif, etc.
+CACHE_DIR = DATA_DIR / "cache"  # GADM JSON, GHSL window, etc.
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 DEFAULT_CRS = "EPSG:4326"
@@ -17,7 +17,7 @@ WEB_MERCATOR_CRS = "EPSG:3857"
 MONTANDON_STAC_URL = os.getenv("MONTANDON_STAC_URL", "https://montandon-eoapi.ifrc.org/stac").rstrip("/")
 MONTANDON_STAC_TOKEN = os.getenv(
     "MONTANDON_STAC_TOKEN",
-    "eyJhbGciOiJSUzI1NiIsImtpZCI6IlNpcllQbE96bWVacUZsdkpUZDBXdmF0dlc4UDYyZG04Y0stRGhwQkxubjQiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiI1ZWQ2ZjE1Yy04ZTg4LTQ0MDgtOGM0Mi0yYmIxNzhjMDVlOGMiLCJ1c2VySWQiOjE1NDYzLCJpYXQiOjE3OTA3NTQ0OTAsImV4cCI6MTgyMjI5MDQ5MCwiaW5Nb3ZlbWVudCI6dHJ1ZX0.XPs8paIhG18A2L2Jh0xrc-2E2Yn-7kpXdkc285VcWlZy2idywuNxI-e0yJGk7BMipCFECIURhl1qEtQJ0954S8ZMdHxt-I0FufVQWyz8ScoS3VhhUGkK3w3EdBK2i3XCfRttwsOkcSjP8ZYf1BPAtSmqdRFfj-c6QjRUZBQ-8uxDgWcAjEoEOnNZE0lfxImsfL8euCdsJTInK9bJflKK8SE2NTuahZnW7V2hZndNt1EnMPDVf_qK53EmPF0WABE1uETrvczIyBuNqHMh0QqsSE0u73AJ92XxBWifoAJb9SJSJWJViDRvzIJpY198Vt11jwVt_HVGX-58HQHgsqEjz4647epSgTkqS-lIwlXwodP3wYabh92KHMXffmqiby8t6wAdvcETYsXpTqu0UueqExqj5Q0ABtPzNfu7FwJqF8Bs28hubemTG5zn-iVDwcF6CFebBveCvCHa4cEs0dnfMoGQRkNA1zkREg0DjzdkLrcAz4_g3HU7Ai_RptJvlmZrTTZMUVTDSlui8OhFASLGQrs9QZm6Vs2VkEpAslcUm76tAQRLHTkCXW1sm9wL7lqkFs-s0xBuP4ZD56_AMo08iL3hlq6bsY7HkH38Lzbo6haq7kbdNjR2h4ir4urVAFwxdPg2DeZvo4rcxuMnSzVYpIhJfmm2L81V-zpkpKdHLY8",
+    "YOUR_TOKEN_HERE",
 )
 # Unused by the notebooks. Kept so the old experimental STAC client still imports.
 CEMS_STAC_URL = os.getenv("CEMS_STAC_URL", "https://stac.dataspace.copernicus.eu/v1")
@@ -25,8 +25,11 @@ CEMS_WFS_URL = os.getenv("CEMS_WFS_URL", "https://example.invalid/cems/wfs")
 CEMS_API_TOKEN = os.getenv("CEMS_API_TOKEN")
 OVERPASS_URL = os.getenv("OVERPASS_URL", "https://overpass-api.de/api/interpreter")
 HDX_API_URL = os.getenv("HDX_API_URL", "https://data.humdata.org/api/3/action")
-WORLDPOP_GIS_URL_TEMPLATE = os.getenv(
-    "WORLDPOP_GIS_URL_TEMPLATE",
-    "https://data.worldpop.org/GIS/Population/Global_2000_2020_1km_UNadj/{year}/{iso}/{iso_lower}_ppp_{year}_1km_Aggregated_UNadj.tif",
+# GHS-POP R2023A Cloud Optimized GeoTIFF on Source Cooperative. {row} and {col}
+# are the Mollweide tile indexes (R{row}_C{col}); {year} is a five-year epoch.
+GHSL_COG_URL_TEMPLATE = os.getenv(
+    "GHSL_COG_URL_TEMPLATE",
+    "https://data.source.coop/nlebovits/ghsl/pop-{year}/pop-{year}-R{row}_C{col}/"
+    "GHS_POP_E{year}_GLOBE_R2023A_54009_100_V1_0_R{row}_C{col}.tif",
 )
 HTTP_TIMEOUT_SECONDS = int(os.getenv("MONTANDON_HTTP_TIMEOUT", "120"))

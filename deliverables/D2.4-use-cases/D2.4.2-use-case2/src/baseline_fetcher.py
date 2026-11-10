@@ -1,21 +1,48 @@
-"""Download GADM, OSM (Overpass), and WorldPop baselines. Results are cached under data/."""
+"""Download GADM, OSM (Overpass), and GHSL population baselines. Results are cached under data/."""
 from __future__ import annotations
 
 import hashlib
 import json
+import math
+import shutil
 import time
 from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
+import numpy as np
+import pyproj
 import rasterio
 import requests
-from rasterio.windows import from_bounds
+from rasterio.errors import RasterioIOError
+from rasterio.transform import from_origin
+from rasterio.windows import Window, from_bounds
 from shapely.geometry import LineString, Point, Polygon
 
-from config.config import CACHE_DIR, DATA_DIR, HTTP_TIMEOUT_SECONDS, OVERPASS_URL, WORLDPOP_GIS_URL_TEMPLATE
+from config.config import CACHE_DIR, DATA_DIR, GHSL_COG_URL_TEMPLATE, HTTP_TIMEOUT_SECONDS, OVERPASS_URL
 
 _USER_AGENT = {"User-Agent": "montandon-impact-estimation/0.1 (IFRC Montandon use case 2)"}
+
+# GHS-POP R2023A on the Source Cooperative mirror: 100 m, ESRI:54009, nodata -200.
+GHSL_EPOCHS = tuple(range(1975, 2031, 5))
+GHSL_CRS = "ESRI:54009"
+GHSL_NODATA = -200.0
+GHSL_CELL_M = 100.0
+_GHSL_X0 = -18_041_000.0
+_GHSL_Y0 = 9_000_000.0
+_GHSL_SPAN_M = 1_000_000.0
+_GHSL_MAX_PIXELS = 80_000_000
+_GDAL_COG_ENV = {
+    "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
+    "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": ".tif",
+    "GDAL_HTTP_MERGE_CONSECUTIVE_RANGES": "YES",
+    "GDAL_HTTP_MULTIPLEX": "YES",
+    "GDAL_HTTP_VERSION": "2",
+    "CPL_VSIL_CURL_USE_HEAD": "NO",
+    "VSI_CACHE": "TRUE",
+    "GDAL_HTTP_USERAGENT": _USER_AGENT["User-Agent"],
+    "GDAL_HTTP_TIMEOUT": str(HTTP_TIMEOUT_SECONDS),
+}
 
 
 def _get(url: str, *, params: dict[str, Any] | None = None, timeout: int | tuple[int, int] | None = None) -> requests.Response:
@@ -26,65 +53,186 @@ def _get(url: str, *, params: dict[str, Any] | None = None, timeout: int | tuple
     return response
 
 
-def _download_file(url: str, destination: Path, *, timeout: tuple[int, int] = (30, 600)) -> None:
-    """Stream a large file to disk via a .part temp path, then rename."""
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    tmp_path = destination.with_suffix(destination.suffix + ".part")
-    with requests.get(url, stream=True, timeout=timeout, headers=_USER_AGENT) as response:
-        response.raise_for_status()
-        with tmp_path.open("wb") as handle:
-            for chunk in response.iter_content(chunk_size=1024 * 256):
-                if chunk:
-                    handle.write(chunk)
-    tmp_path.replace(destination)
-
-
 def _path(prefix: str, value: str, suffix: str) -> Path:
     """Stable cache filename from a hash of the request key."""
     key = hashlib.sha256(value.encode("utf-8")).hexdigest()[:20]
     return CACHE_DIR / f"{prefix}_{key}{suffix}"
 
 
-def fetch_worldpop_population(
+def fetch_ghsl_population(
     *,
-    country_code: str,
+    bbox: list[float],
     year: int = 2020,
-    bbox: list[float] | None = None,
     output_path: str | Path | None = None,
 ) -> Path:
-    """Download WorldPop 1 km unconstrained population and optionally clip to bbox."""
-    if not country_code:
-        raise ValueError("country_code is required for WorldPop downloads")
-    iso = country_code.upper()
-    url = WORLDPOP_GIS_URL_TEMPLATE.format(year=year, iso=iso, iso_lower=iso.lower())
-    destination = Path(output_path) if output_path else DATA_DIR / "baseline" / f"{iso.lower()}_ppp_{year}_1km.tif"
+    """Read a GHS-POP R2023A 100 m window and cache the mosaic.
+
+    ``bbox`` is ``[west, south, east, north]`` in WGS84 degrees. The mirror is a
+    set of Cloud Optimized GeoTIFFs on the ESRI:54009 Mollweide grid, so only
+    the tiles covering that box are opened and only the overlapping pixels are
+    transferred. ``year`` must be a five-year epoch from 1975 through 2030.
+    Epochs 2025 and 2030 are model projections.
+    """
+    if year not in GHSL_EPOCHS:
+        allowed = ", ".join(str(item) for item in GHSL_EPOCHS)
+        raise ValueError(f"ghsl_epoch must be one of: {allowed}")
+    if bbox is None or len(bbox) != 4:
+        raise ValueError("bbox must be [west, south, east, north] in WGS84 degrees")
+    west, south, east, north = (float(value) for value in bbox)
+    if west >= east or south >= north:
+        raise ValueError("bbox must have west < east and south < north")
+
+    destination = Path(output_path) if output_path else DATA_DIR / "baseline" / f"ghsl_pop_{year}.tif"
     destination.parent.mkdir(parents=True, exist_ok=True)
-    source_path = CACHE_DIR / f"worldpop_{iso.lower()}_{year}_1km.tif"
-    if not source_path.exists() or source_path.stat().st_size < 10_000:
-        _download_file(url, source_path)
-    if bbox is None:
-        if destination.resolve() != source_path.resolve():
-            destination.write_bytes(source_path.read_bytes())
+    cache_key = hashlib.sha256(
+        f"{year}|{west:.8f}|{south:.8f}|{east:.8f}|{north:.8f}".encode("utf-8")
+    ).hexdigest()[:20]
+    cache_path = CACHE_DIR / f"ghsl_pop_{year}_{cache_key}.tif"
+    if _raster_cache_ok(cache_path):
+        if destination.resolve() != cache_path.resolve():
+            shutil.copyfile(cache_path, destination)
         return destination
-    _clip_raster(source_path, destination, bbox)
+
+    minx, miny, maxx, maxy = _snap_mollweide_bounds(*_bbox_to_mollweide(west, south, east, north))
+    urls = [_ghsl_tile_url(year, row, col) for row, col in _tile_ids_for_bounds(minx, miny, maxx, maxy)]
+    _mosaic_ghsl_window(urls, (minx, miny, maxx, maxy), cache_path)
+    if destination.resolve() != cache_path.resolve():
+        shutil.copyfile(cache_path, destination)
     return destination
 
 
-def _clip_raster(source: Path, destination: Path, bbox: list[float]) -> None:
-    """Write a WGS84 window of the country raster (bbox = west, south, east, north)."""
-    west, south, east, north = bbox
-    with rasterio.open(source) as src:
-        window = from_bounds(west, south, east, north, transform=src.transform)
-        window = window.round_offsets().round_lengths().intersection(
-            rasterio.windows.Window(0, 0, src.width, src.height)
+def _raster_cache_ok(path: Path) -> bool:
+    if not path.exists() or path.stat().st_size < 500:
+        return False
+    try:
+        with rasterio.open(path) as src:
+            return src.width > 0 and src.height > 0 and src.crs is not None
+    except RasterioIOError:
+        return False
+
+
+def _bbox_to_mollweide(west: float, south: float, east: float, north: float) -> tuple[float, float, float, float]:
+    """Envelope of a WGS84 box on ESRI:54009. Edges are sampled because meridians curve."""
+    transformer = pyproj.Transformer.from_crs("EPSG:4326", GHSL_CRS, always_xy=True)
+    samples = 17
+    lons: list[float] = []
+    lats: list[float] = []
+    for index in range(samples):
+        step = index / (samples - 1)
+        lon = west + (east - west) * step
+        lat = south + (north - south) * step
+        lons.extend((lon, lon, west, east))
+        lats.extend((south, north, lat, lat))
+    xs, ys = transformer.transform(lons, lats)
+    pairs = [(float(x), float(y)) for x, y in zip(xs, ys) if math.isfinite(x) and math.isfinite(y)]
+    if not pairs:
+        raise ValueError("bbox does not fall on the Mollweide grid")
+    return (
+        min(x for x, _ in pairs),
+        min(y for _, y in pairs),
+        max(x for x, _ in pairs),
+        max(y for _, y in pairs),
+    )
+
+
+def _snap_mollweide_bounds(minx: float, miny: float, maxx: float, maxy: float) -> tuple[float, float, float, float]:
+    """Expand bounds onto the 100 m GHSL pixel edges."""
+    minx = _GHSL_X0 + math.floor((minx - _GHSL_X0) / GHSL_CELL_M) * GHSL_CELL_M
+    maxx = _GHSL_X0 + math.ceil((maxx - _GHSL_X0) / GHSL_CELL_M) * GHSL_CELL_M
+    maxy = _GHSL_Y0 - math.floor((_GHSL_Y0 - maxy) / GHSL_CELL_M) * GHSL_CELL_M
+    miny = _GHSL_Y0 - math.ceil((_GHSL_Y0 - miny) / GHSL_CELL_M) * GHSL_CELL_M
+    if maxx <= minx:
+        maxx = minx + GHSL_CELL_M
+    if maxy <= miny:
+        maxy = miny + GHSL_CELL_M
+    return minx, miny, maxx, maxy
+
+
+def _tile_rc(x: float, y: float) -> tuple[int, int]:
+    row = int((_GHSL_Y0 - y) // _GHSL_SPAN_M) + 1
+    col = int((x - _GHSL_X0) // _GHSL_SPAN_M) + 1
+    return row, col
+
+
+def _tile_ids_for_bounds(minx: float, miny: float, maxx: float, maxy: float) -> list[tuple[int, int]]:
+    """Tile indexes covering the snapped window. Exclusive edges stay with the tile they start."""
+    inset = GHSL_CELL_M / 2
+    row_north, col_west = _tile_rc(minx, maxy - inset)
+    row_south, col_east = _tile_rc(maxx - inset, miny + inset)
+    rows = range(min(row_north, row_south), max(row_north, row_south) + 1)
+    cols = range(min(col_west, col_east), max(col_west, col_east) + 1)
+    return [(row, col) for row in rows for col in cols]
+
+
+def _ghsl_tile_url(year: int, row: int, col: int) -> str:
+    return GHSL_COG_URL_TEMPLATE.format(year=year, row=row, col=col)
+
+
+def _missing_remote_tile(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return "404" in text or "not found" in text or "no such file" in text
+
+
+def _mosaic_ghsl_window(urls: list[str], bounds: tuple[float, float, float, float], destination: Path) -> None:
+    """Read each remote COG window and write one local GeoTIFF in ESRI:54009."""
+    minx, miny, maxx, maxy = bounds
+    width = int(round((maxx - minx) / GHSL_CELL_M))
+    height = int(round((maxy - miny) / GHSL_CELL_M))
+    if width <= 0 or height <= 0:
+        raise ValueError("GHSL window is empty")
+    if width * height > _GHSL_MAX_PIXELS:
+        raise ValueError(
+            f"GHSL window is {width}x{height} pixels; narrow the event bbox before reading 100 m cells"
         )
-        data = src.read(window=window)
-        transform = src.window_transform(window)
-        profile = src.profile.copy()
-        profile.update(height=data.shape[1], width=data.shape[2], transform=transform)
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        with rasterio.open(destination, "w", **profile) as dst:
-            dst.write(data)
+    mosaic = np.full((height, width), GHSL_NODATA, dtype="float32")
+    found = 0
+    with rasterio.Env(**_GDAL_COG_ENV):
+        for url in urls:
+            try:
+                with rasterio.open(url) as src:
+                    window = from_bounds(minx, miny, maxx, maxy, transform=src.transform)
+                    window = window.round_offsets().round_lengths().intersection(Window(0, 0, src.width, src.height))
+                    if window.width <= 0 or window.height <= 0:
+                        continue
+                    data = src.read(1, window=window)
+                    win_transform = src.window_transform(window)
+                    col0 = int(round((win_transform.c - minx) / GHSL_CELL_M))
+                    row0 = int(round((maxy - win_transform.f) / GHSL_CELL_M))
+                    row_count, col_count = data.shape
+                    row_start = max(row0, 0)
+                    col_start = max(col0, 0)
+                    row_end = min(row0 + row_count, height)
+                    col_end = min(col0 + col_count, width)
+                    if row_end <= row_start or col_end <= col_start:
+                        continue
+                    mosaic[row_start:row_end, col_start:col_end] = data[
+                        row_start - row0 : row_start - row0 + (row_end - row_start),
+                        col_start - col0 : col_start - col0 + (col_end - col_start),
+                    ]
+                    found += 1
+            except RasterioIOError as exc:
+                if _missing_remote_tile(exc):
+                    continue
+                raise
+    if found == 0:
+        raise RuntimeError("GHSL window read failed: no published tile covers this bbox")
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_suffix(destination.suffix + ".part")
+    profile = {
+        "driver": "GTiff",
+        "height": height,
+        "width": width,
+        "count": 1,
+        "dtype": "float32",
+        "crs": GHSL_CRS,
+        "transform": from_origin(minx, maxy, GHSL_CELL_M, GHSL_CELL_M),
+        "nodata": GHSL_NODATA,
+        "compress": "deflate",
+    }
+    with rasterio.open(temporary, "w", **profile) as dst:
+        dst.write(mosaic, 1)
+    temporary.replace(destination)
 
 
 def _geometry_from_osm(element: dict[str, Any]):

@@ -130,9 +130,8 @@ def population_under_impact(
 ) -> pd.DataFrame:
     """Sum population raster cells that touch the impact mask, by admin unit.
 
-    Building footprints are much smaller than a 1 km WorldPop cell. ``all_touched``
-    counts a cell if any damaged feature overlaps it, which is the intended
-    settlement-level exposure estimate for grading products.
+    GHS-POP cells are 100 m. A building footprint can still be smaller than one
+    cell, so ``all_touched`` counts a cell when any damaged feature overlaps it.
     """
     key = admin_id_column(admin)
     if impact.empty:

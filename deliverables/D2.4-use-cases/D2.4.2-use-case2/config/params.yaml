@@ -8,10 +8,11 @@ hazard_type: "earthquake"
 # GADM admin level. Options: 1 (region) | 2 (municipality / department) | 3 (finer, if GADM has it)
 target_admin_level: 2
 
-# Reserved for age-disaggregated WorldPop later. Currently unused. Options: all | children | under_5
+# Reserved. GHSL GHS-POP is total residential population, so this setting is unused.
+# Options: all | children | under_5
 target_age_group: "all"
 
-# ISO3 country code for GADM + WorldPop (e.g. VEN, NPL, UKR). Must match the event country.
+# ISO3 country code for GADM (e.g. VEN, NPL, UKR). Must match the event country.
 country_code: "VEN"
 
 # Bounding box [west, south, east, north] in WGS84. null = derived from the cached layers
@@ -31,15 +32,16 @@ impact:
     - Destroyed
     - Damaged
     - Possibly damaged
-  # Extra degrees added around the Copernicus extent for OSM / WorldPop clip
+  # Extra degrees added around the Copernicus extent for OSM / GHSL clip
   bbox_buffer_deg: 0.05
 
 baseline:
   # OSM layers to query. Implemented keys: hospital | school | primary_road | secondary_road | airport
   # Remove any you do not need (roads are the heaviest Overpass queries).
   infrastructure_filters: ["hospital", "school", "primary_road", "secondary_road", "airport"]
-  # WorldPop unconstrained 1 km year. Current download template is built for 2020.
-  worldpop_year: 2020
+  # GHS-POP R2023A epoch (100 m). Options: 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030.
+  # 2025 and 2030 are model projections.
+  ghsl_epoch: 2020
   # Admin boundaries. Options: gadm (works) | hdx (not implemented)
   admin_source: "gadm"
 

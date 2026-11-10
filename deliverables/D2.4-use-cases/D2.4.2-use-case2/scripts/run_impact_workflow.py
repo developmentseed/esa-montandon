@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 from shapely.geometry import box
 
-from src.baseline_fetcher import fetch_admin_boundaries, fetch_osm_infrastructure, fetch_worldpop_population
+from src.baseline_fetcher import fetch_admin_boundaries, fetch_ghsl_population, fetch_osm_infrastructure
 from src.cems_api import load_cached_vectors
 from src.copernicus_loader import bbox_from_geodataframe, concat_layers, filter_impact, load_params
 from src.spatial_analysis import (
@@ -48,18 +48,17 @@ def main() -> None:
     )
     print("infra", len(infrastructure), infrastructure.attrs.get("overpass_errors"), flush=True)
 
-    # 4. WorldPop 1 km raster (optional: analysis continues if the download fails)
+    # 4. GHSL 100 m window (optional: analysis continues if the read fails)
     population_path = None
     try:
-        population_path = fetch_worldpop_population(
-            country_code=params["country_code"],
-            year=int(params["baseline"]["worldpop_year"]),
+        population_path = fetch_ghsl_population(
+            year=int(params["baseline"]["ghsl_epoch"]),
             bbox=bbox,
             output_path=ROOT / "data" / "baseline" / "population.tif",
         )
         print("population", population_path, flush=True)
     except Exception as exc:
-        print("WorldPop failed", exc, flush=True)
+        print("GHSL failed", exc, flush=True)
 
     # 5. Counts / area / population by admin, then map + CSV / GeoJSON
     crs = choose_analysis_crs(admin)
